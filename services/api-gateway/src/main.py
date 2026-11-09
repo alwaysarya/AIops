@@ -33,3 +33,6 @@ init_db()
 
 from src.routes import settings
 app.include_router(settings.router, prefix="/api/v1/settings", tags=["Settings"])
+
+from src.routes import websocket
+app.include_router(websocket.router, prefix="/api/v1/ws", tags=["WebSocket"])
