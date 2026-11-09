@@ -1,6 +1,6 @@
-import React from 'react'
-import { LayoutDashboard, Activity, AlertTriangle, Settings } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import React from "react"
+import { LayoutDashboard, Activity, AlertTriangle, Settings } from "lucide-react"
+import { Link, useLocation } from "react-router-dom"
 
 const Sidebar = () => {
   const location = useLocation()
@@ -19,24 +19,24 @@ const Sidebar = () => {
           <span className="text-xl font-bold text-blue-400">AIOps Platform</span>
         </div>
         <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-          <Link to="/" className={getLinkClass('/')}>
+          <Link to="/" className={getLinkClass("/")}>
             <LayoutDashboard className="w-5 h-5 mr-3" />
             Dashboard
           </Link>
-          <Link to="/logs" className={getLinkClass('/logs')}>
+          <Link to="/logs" className={getLinkClass("/logs")}>
             <Activity className="w-5 h-5 mr-3" />
             Logs & Metrics
           </Link>
-          <Link to="/alerts" className={getLinkClass('/alerts')}>
+          <Link to="/alerts" className={getLinkClass("/alerts")}>
             <AlertTriangle className="w-5 h-5 mr-3" />
             Alerts
           </Link>
         </nav>
         <div className="p-4 border-t border-slate-700">
-          <a href="#" className="flex items-center px-4 py-2 text-slate-400 hover:bg-slate-700/50 rounded-lg hover:text-slate-200 transition-colors">
+          <Link to="/settings" className={getLinkClass("/settings")}>
             <Settings className="w-5 h-5 mr-3" />
             Settings
-          </a>
+          </Link>
         </div>
       </div>
     </aside>

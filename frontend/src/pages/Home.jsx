@@ -1,11 +1,26 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Common/Sidebar'
 import Navbar from '../components/Common/Navbar'
 import SystemHealth from '../components/Dashboard/SystemHealth'
 import AnomalyChart from '../components/Dashboard/AnomalyChart'
 import AlertTimeline from '../components/Dashboard/AlertTimeline'
+import axios from 'axios'
 
 const Home = () => {
+  const [healthData, setHealthData] = useState({ status: 'loading' })
+
+  useEffect(() => {
+    // Backend API call
+    axios.get('http://localhost:8000/api/v1/health/')
+      .then(response => {
+        setHealthData(response.data)
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error)
+        setHealthData({ status: 'error' })
+      })
+  }, [])
+
   return (
     <div className="flex h-screen bg-slate-900">
       <Sidebar />
@@ -13,7 +28,12 @@ const Home = () => {
         <Navbar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-900 p-6">
           <div className="container mx-auto">
-            <h2 className="text-2xl font-semibold text-white mb-6">System Overview</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold text-white">System Overview</h2>
+              <div className="text-sm text-slate-400">
+                Backend Status: <span className={healthData.status === 'healthy' ? 'text-green-400' : 'text-red-400'}>{healthData.status}</span>
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <SystemHealth title="Active Services" value="7" status="healthy" />

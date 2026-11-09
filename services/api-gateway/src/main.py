@@ -28,3 +28,8 @@ Instrumentator().instrument(app).expose(app)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
+from src.database import init_db
+init_db()
+
+from src.routes import settings
+app.include_router(settings.router, prefix="/api/v1/settings", tags=["Settings"])
