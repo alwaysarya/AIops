@@ -11,7 +11,7 @@ const Home = () => {
 
   useEffect(() => {
     // Backend API call
-    axios.get('http://localhost:8000/api/v1/health/')
+    axios.get('import.meta.env.VITE_API_URL/api/v1/health/')
       .then(response => {
         setHealthData(response.data)
       })

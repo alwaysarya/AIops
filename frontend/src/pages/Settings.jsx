@@ -8,15 +8,15 @@ const Settings = () => {
   const [message, setMessage] = useState("")
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/v1/settings/").then(res => {
+    axios.get("import.meta.env.VITE_API_URL/api/v1/settings/").then(res => {
       setSettings(res.data)
     }).catch(err => console.error(err))
   }, [])
 
   const handleSave = async () => {
     try {
-      await axios.post("http://localhost:8000/api/v1/settings/", { key: "api_url", value: settings.api_url })
-      await axios.post("http://localhost:8000/api/v1/settings/", { key: "kafka_url", value: settings.kafka_url })
+      await axios.post("import.meta.env.VITE_API_URL/api/v1/settings/", { key: "api_url", value: settings.api_url })
+      await axios.post("import.meta.env.VITE_API_URL/api/v1/settings/", { key: "kafka_url", value: settings.kafka_url })
       setMessage("Settings saved successfully!")
     } catch (err) {
       setMessage("Error saving settings")
