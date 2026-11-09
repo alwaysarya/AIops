@@ -1,0 +1,8 @@
+{
+  "title": "AIOps System Overview",
+  "panels": [
+    { "type": "graph", "title": "CPU Usage" },
+    { "type": "graph", "title": "Request Rate" },
+    { "type": "singlestat", "title": "Active Anomalies" }
+  ]
+}
