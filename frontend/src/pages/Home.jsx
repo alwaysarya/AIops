@@ -5,13 +5,21 @@ import SystemHealth from '../components/Dashboard/SystemHealth'
 import AlertTimeline from '../components/Dashboard/AlertTimeline'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
-import { Brain, TrendingUp } from 'lucide-react'
+import { Brain, TrendingUp, Clock } from 'lucide-react'
 
 const Home = () => {
   const [healthData, setHealthData] = useState({ status: 'loading' })
   const [anomalyCount, setAnomalyCount] = useState(0)
+  const [timeRange, setTimeRange] = useState('1h')
   const [chartData, setChartData] = useState([40, 30, 60, 20, 80, 50, 90, 30, 40, 70, 20, 50])
   const [prediction, setPrediction] = useState(null)
+
+  // Change chart data based on time range
+  useEffect(() => {
+    if (timeRange === '1h') setChartData([40, 30, 60, 20, 80, 50, 90, 30, 40, 70, 20, 50])
+    if (timeRange === '24h') setChartData([10, 45, 30, 80, 20, 90, 50, 60, 30, 70, 40, 55])
+    if (timeRange === '7d') setChartData([60, 20, 80, 40, 30, 70, 90, 10, 50, 60, 20, 40])
+  }, [timeRange])
 
   useEffect(() => {
     axios.get('http://localhost:8000/api/v1/health/')
@@ -54,8 +62,8 @@ const Home = () => {
           <div className="container mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-white">System Overview</h2>
-              <div className="text-sm text-slate-400">
-                Backend: <span className={healthData.status === 'healthy' ? 'text-green-400' : 'text-red-400'}>{healthData.status}</span>
+              <div className="text-sm text-slate-400 flex items-center">
+                Backend: <span className={`ml-2 px-2 py-1 rounded text-xs font-bold ${healthData.status === 'healthy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{healthData.status.toUpperCase()}</span>
               </div>
             </div>
             
@@ -83,7 +91,18 @@ const Home = () => {
               <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-medium text-white">Live Anomaly Trend</h3>
-                  <span className="text-xs text-blue-400 animate-pulse">● Updating...</span>
+                  <div className="flex items-center text-xs text-slate-400 bg-slate-900 rounded p-1">
+                    <Clock className="w-3 h-3 mr-1" />
+                    <select 
+                      value={timeRange} 
+                      onChange={(e) => setTimeRange(e.target.value)}
+                      className="bg-transparent outline-none cursor-pointer text-white"
+                    >
+                      <option value="1h">Last 1 Hour</option>
+                      <option value="24h">Last 24 Hours</option>
+                      <option value="7d">Last 7 Days</option>
+                    </select>
+                  </div>
                 </div>
                 <div className="w-full h-64 flex items-end space-x-2">
                   {chartData.map((height, i) => (

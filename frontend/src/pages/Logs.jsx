@@ -11,39 +11,29 @@ const Logs = () => {
 
   useEffect(() => {
     const fetchLogs = () => {
-      axios.get('http://localhost:8000/api/v1/logs/')
-        .then(res => setLogs(res.data.logs))
-        .catch(err => console.error(err))
+      axios.get('http://localhost:8000/api/v1/logs/', {
+        params: { search: searchTerm, level: filterLevel }
+      })
+      .then(res => setLogs(res.data.logs))
+      .catch(err => console.error(err))
     }
-    fetchLogs()
-    const interval = setInterval(fetchLogs, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const filteredLogs = logs.filter(log => {
-    const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          log.service.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesLevel = filterLevel === 'ALL' || log.level === filterLevel
-    return matchesSearch && matchesLevel
-  })
-
-  // Export CSV Function
-  const exportToCSV = () => {
-    const headers = ['Timestamp', 'Service', 'Level', 'Message']
-    const csvRows = filteredLogs.map(log => 
-      `"${log.timestamp}","${log.service}","${log.level}","${log.message}"`
-    )
-    const csvContent = [headers.join(','), ...csvRows].join('\n')
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', 'aiops_logs.csv')
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+    const delayDebounceFn = setTimeout(() => {
+      fetchLogs()
+    }, 500)
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchTerm, filterLevel])
+
+  // Auto refresh every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      axios.get('http://localhost:8000/api/v1/logs/', {
+        params: { search: searchTerm, level: filterLevel }
+      }).then(res => setLogs(res.data.logs))
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [searchTerm, filterLevel])
 
   return (
     <div className="flex h-screen bg-slate-900">
@@ -53,12 +43,9 @@ const Logs = () => {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-white">System Logs</h2>
-            <button 
-              onClick={exportToCSV}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center transition-colors"
-            >
-              <Download className="w-4 h-4 mr-2" /> Export to CSV
-            </button>
+            <span className="text-xs text-green-400 flex items-center">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span> Live Sync
+            </span>
           </div>
 
           <div className="flex space-x-4 mb-4">
@@ -66,10 +53,10 @@ const Logs = () => {
               <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
-                placeholder="Search logs..." 
+                placeholder="Search logs by message or service..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-4 py-2 outline-none" 
+                className="w-full bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500" 
               />
             </div>
             <select 
@@ -95,10 +82,10 @@ const Logs = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredLogs.length === 0 ? (
-                  <tr><td colSpan="4" className="text-center py-4">No logs found</td></tr>
+                {logs.length === 0 ? (
+                  <tr><td colSpan="4" className="text-center py-4 text-slate-500">No logs found</td></tr>
                 ) : (
-                  filteredLogs.map((log, index) => (
+                  logs.map((log, index) => (
                     <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50">
                       <td className="px-4 py-3 text-xs text-slate-500">{new Date(log.timestamp).toLocaleTimeString()}</td>
                       <td className="px-4 py-3 font-medium">{log.service}</td>

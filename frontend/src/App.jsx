@@ -9,6 +9,7 @@ import Topology from './pages/Topology'
 import Reports from './pages/Reports'
 import Incidents from './pages/Incidents'
 import AuditLogs from './pages/AuditLogs'
+import Backup from './pages/Backup'
 import Profile from './pages/Profile'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/audit-logs" element={<AuditLogs />} />
+          <Route path="/backup" element={<Backup />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>

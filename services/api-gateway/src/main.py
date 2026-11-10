@@ -37,3 +37,6 @@ if __name__ == "__main__":
 
 from src.routes import profile
 app.include_router(profile.router, prefix="/api/v1/profile", tags=["Profile"])
+
+from src.routes import backup
+app.include_router(backup.router, prefix="/api/v1/backup", tags=["Backup"])
