@@ -36,3 +36,8 @@ app.include_router(settings.router, prefix="/api/v1/settings", tags=["Settings"]
 
 from src.routes import websocket
 app.include_router(websocket.router, prefix="/api/v1/ws", tags=["WebSocket"])
+
+from src.routes import remediation
+app.include_router(remediation.router, prefix="/api/v1/remediation", tags=["Remediation"])
+
+from src.routes import logs

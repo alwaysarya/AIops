@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Common/Sidebar'
 import Navbar from '../components/Common/Navbar'
 import { Search, Filter } from 'lucide-react'
+import axios from 'axios'
 
 const Logs = () => {
   const [logs, setLogs] = useState([])
@@ -9,15 +10,15 @@ const Logs = () => {
   const [filterLevel, setFilterLevel] = useState('ALL')
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const ws = new WebSocket(`ws://localhost:8000/api/v1/ws/ws?token=${token}`)
-
-    ws.onmessage = (event) => {
-      const newLog = JSON.parse(event.data)
-      setLogs((prevLogs) => [newLog, ...prevLogs].slice(0, 50))
+    // Poll backend every 2 seconds for new logs
+    const fetchLogs = () => {
+      axios.get('http://localhost:8000/api/v1/logs/')
+        .then(res => setLogs(res.data.logs.reverse()))
+        .catch(err => console.error(err))
     }
-
-    return () => ws.close()
+    fetchLogs()
+    const interval = setInterval(fetchLogs, 2000)
+    return () => clearInterval(interval)
   }, [])
 
   const filteredLogs = logs.filter(log => {
@@ -34,38 +35,34 @@ const Logs = () => {
         <Navbar />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-white">Real-time System Logs</h2>
+            <h2 className="text-2xl font-semibold text-white">System Logs</h2>
             <span className="text-green-400 text-sm flex items-center">
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-              Live Stream
+              Live Polling
             </span>
           </div>
 
-          {/* Search & Filter Bar */}
           <div className="flex space-x-4 mb-4">
             <div className="relative flex-1">
               <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
-                placeholder="Search logs by message or service..." 
+                placeholder="Search logs..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
+                className="w-full bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-4 py-2 outline-none" 
               />
             </div>
-            <div className="relative">
-              <Filter className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-              <select 
-                value={filterLevel}
-                onChange={(e) => setFilterLevel(e.target.value)}
-                className="bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-8 py-2 focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
-              >
-                <option value="ALL">All Levels</option>
-                <option value="INFO">INFO</option>
-                <option value="WARNING">WARNING</option>
-                <option value="ERROR">ERROR</option>
-              </select>
-            </div>
+            <select 
+              value={filterLevel}
+              onChange={(e) => setFilterLevel(e.target.value)}
+              className="bg-slate-800 text-white border border-slate-700 rounded-lg px-4 py-2 outline-none"
+            >
+              <option value="ALL">All Levels</option>
+              <option value="INFO">INFO</option>
+              <option value="WARNING">WARNING</option>
+              <option value="ERROR">ERROR</option>
+            </select>
           </div>
           
           <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 h-[calc(100vh-240px)] overflow-y-auto">
@@ -80,10 +77,10 @@ const Logs = () => {
               </thead>
               <tbody>
                 {filteredLogs.length === 0 ? (
-                  <tr><td colSpan="4" className="text-center py-4">No logs match your criteria</td></tr>
+                  <tr><td colSpan="4" className="text-center py-4">Waiting for logs...</td></tr>
                 ) : (
                   filteredLogs.map((log, index) => (
-                    <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
+                    <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50">
                       <td className="px-4 py-3 text-xs text-slate-500">{new Date(log.timestamp).toLocaleTimeString()}</td>
                       <td className="px-4 py-3 font-medium">{log.service}</td>
                       <td className="px-4 py-3">

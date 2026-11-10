@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Logs from './pages/Logs'
 import Alerts from './pages/Alerts'
 import Settings from './pages/Settings'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/logs" element={<Logs />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>
