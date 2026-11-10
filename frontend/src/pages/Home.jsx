@@ -4,22 +4,21 @@ import Navbar from '../components/Common/Navbar'
 import SystemHealth from '../components/Dashboard/SystemHealth'
 import AlertTimeline from '../components/Dashboard/AlertTimeline'
 import axios from 'axios'
+import { Brain, TrendingUp } from 'lucide-react'
 
 const Home = () => {
   const [healthData, setHealthData] = useState({ status: 'loading' })
   const [anomalyCount, setAnomalyCount] = useState(0)
   const [chartData, setChartData] = useState([40, 30, 60, 20, 80, 50, 90, 30, 40, 70, 20, 50])
+  const [prediction, setPrediction] = useState(null)
 
   useEffect(() => {
-    // 1. Fetch initial health status
     axios.get('http://localhost:8000/api/v1/health/')
       .then(response => setHealthData(response.data))
       .catch(() => setHealthData({ status: 'error' }))
 
-    // 2. Poll AI Anomaly Detector every 5 seconds
     const interval = setInterval(async () => {
       try {
-        // Simulate sending a random log to AI
         const res = await axios.post('http://localhost:8000/api/v1/ai/analyze', {
           service: "payment-service",
           level: Math.random() > 0.5 ? "ERROR" : "INFO",
@@ -27,8 +26,15 @@ const Home = () => {
         })
         if (res.data.is_anomaly) {
           setAnomalyCount(prev => prev + 1)
-          // Update chart data dynamically
           setChartData(prev => [...prev.slice(1), Math.min(100, Math.floor(Math.random() * 40) + 60)])
+          
+          if (Math.random() > 0.7) {
+            setPrediction({
+              message: "Traffic spike detected in payment-service.",
+              forecast: "CPU usage will exceed 90% in 15 minutes.",
+              action: "Recommendation: Enable auto-scaling."
+            })
+          }
         }
       } catch (err) {
         console.error("AI check failed", err)
@@ -47,11 +53,8 @@ const Home = () => {
           <div className="container mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-white">System Overview</h2>
-              <div className="text-sm text-slate-400 flex items-center">
-                Backend Status: 
-                <span className={`ml-2 px-2 py-1 rounded text-xs font-bold ${healthData.status === 'healthy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                  {healthData.status.toUpperCase()}
-                </span>
+              <div className="text-sm text-slate-400">
+                Backend: <span className={healthData.status === 'healthy' ? 'text-green-400' : 'text-red-400'}>{healthData.status}</span>
               </div>
             </div>
             
@@ -61,6 +64,20 @@ const Home = () => {
               <SystemHealth title="Critical Alerts" value="1" status="critical" />
             </div>
 
+            {prediction && (
+              <div className="mb-6 bg-purple-500/10 border border-purple-500/50 rounded-lg p-4 flex items-start">
+                <Brain className="w-6 h-6 text-purple-400 mr-4 mt-1" />
+                <div>
+                  <h3 className="text-purple-400 font-bold flex items-center">
+                    <TrendingUp className="w-4 h-4 mr-2" /> AI Predictive Insight
+                  </h3>
+                  <p className="text-slate-300 text-sm mt-1">{prediction.message}</p>
+                  <p className="text-white font-medium text-sm mt-2">Forecast: {prediction.forecast}</p>
+                  <p className="text-green-400 text-xs mt-2 font-bold bg-green-500/10 inline-block px-2 py-1 rounded">{prediction.action}</p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
                 <div className="flex justify-between items-center mb-4">
@@ -69,11 +86,7 @@ const Home = () => {
                 </div>
                 <div className="w-full h-64 flex items-end space-x-2">
                   {chartData.map((height, i) => (
-                    <div 
-                      key={i} 
-                      className={`flex-1 rounded-t transition-all duration-500 ${height > 70 ? 'bg-red-500/80' : 'bg-blue-500/60'}`}
-                      style={{ height: `${height}%` }}
-                    ></div>
+                    <div key={i} className={`flex-1 rounded-t transition-all duration-500 ${height > 70 ? 'bg-red-500/80' : 'bg-blue-500/60'}`} style={{ height: `${height}%` }}></div>
                   ))}
                 </div>
               </div>

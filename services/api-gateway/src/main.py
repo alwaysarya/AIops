@@ -41,3 +41,6 @@ from src.routes import remediation
 app.include_router(remediation.router, prefix="/api/v1/remediation", tags=["Remediation"])
 
 from src.routes import logs
+
+from src.routes import ai_proxy
+app.include_router(ai_proxy.router, prefix="/api/v1/ai", tags=["AI"])
