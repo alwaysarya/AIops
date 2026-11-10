@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Bell, Search, User } from 'lucide-react'
+import SystemStatus from './SystemStatus'
 
 const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false)
@@ -16,6 +17,7 @@ const Navbar = () => {
           />
         </div>
       </div>
+      <SystemStatus />
       <div className="flex items-center space-x-4">
         <div className="relative">
           <button 

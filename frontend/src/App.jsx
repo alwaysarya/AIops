@@ -6,6 +6,9 @@ import Alerts from './pages/Alerts'
 import Settings from './pages/Settings'
 import RCA from './pages/RCA'
 import Topology from './pages/Topology'
+import Reports from './pages/Reports'
+import Incidents from './pages/Incidents'
+import AuditLogs from './pages/AuditLogs'
 import Profile from './pages/Profile'
 
 function App() {
@@ -19,6 +22,9 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/rca" element={<RCA />} />
           <Route path="/topology" element={<Topology />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/incidents" element={<Incidents />} />
+          <Route path="/audit-logs" element={<AuditLogs />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
