@@ -10,6 +10,8 @@ import Reports from './pages/Reports'
 import Incidents from './pages/Incidents'
 import AuditLogs from './pages/AuditLogs'
 import Backup from './pages/Backup'
+import SystemHealth from './pages/SystemHealth'
+import ApiDocs from './pages/ApiDocs'
 import Profile from './pages/Profile'
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/audit-logs" element={<AuditLogs />} />
           <Route path="/backup" element={<Backup />} />
+          <Route path="/system-health" element={<SystemHealth />} />
+          <Route path="/api-docs" element={<ApiDocs />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
