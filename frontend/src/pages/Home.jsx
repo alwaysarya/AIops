@@ -3,6 +3,7 @@ import Sidebar from '../components/Common/Sidebar'
 import Navbar from '../components/Common/Navbar'
 import SystemHealth from '../components/Dashboard/SystemHealth'
 import AlertTimeline from '../components/Dashboard/AlertTimeline'
+import Footer from '../components/Common/Footer'
 import axios from 'axios'
 import { Brain, TrendingUp } from 'lucide-react'
 
@@ -97,6 +98,7 @@ const Home = () => {
             </div>
           </div>
         </main>
+        <Footer />
       </div>
     </div>
   )

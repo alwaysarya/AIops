@@ -44,6 +44,7 @@ const Navbar = () => {
             </div>
           )}
         </div>
+        <div className="text-xs font-bold bg-green-500/10 text-green-400 px-2 py-1 rounded border border-green-500/20">PROD</div>
         <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white cursor-pointer">
           <User className="w-5 h-5" />
         </div>
