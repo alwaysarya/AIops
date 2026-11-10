@@ -1,8 +1,15 @@
 {
-  "title": "AIOps System Overview",
+  "title": "AIOps Platform Dashboard",
   "panels": [
-    { "type": "graph", "title": "CPU Usage" },
-    { "type": "graph", "title": "Request Rate" },
-    { "type": "singlestat", "title": "Active Anomalies" }
+    {
+      "type": "graph",
+      "title": "API Gateway Request Rate",
+      "targets": [{"expr": "rate(http_requests_total[5m])"}]
+    },
+    {
+      "type": "singlestat",
+      "title": "Active Anomalies",
+      "targets": [{"expr": "aiops_anomalies_total"}]
+    }
   ]
 }
