@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Common/Sidebar'
 import Navbar from '../components/Common/Navbar'
-import { Search, Download } from 'lucide-react'
+import { Search } from 'lucide-react'
 import axios from 'axios'
+import { useSearchParams } from 'react-router-dom'
 
 const Logs = () => {
   const [logs, setLogs] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterLevel, setFilterLevel] = useState('ALL')
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    const querySearch = searchParams.get('search')
+    if (querySearch) setSearchTerm(querySearch)
+  }, [searchParams])
 
   useEffect(() => {
     const fetchLogs = () => {
-      axios.get('http://localhost:8081/api/v1/logs/', {
+      axios.get('http://localhost:8000/api/v1/logs/', {
         params: { search: searchTerm, level: filterLevel }
       })
       .then(res => setLogs(res.data.logs))
       .catch(err => console.error(err))
     }
-    
-    const delayDebounceFn = setTimeout(() => {
-      fetchLogs()
-    }, 500)
-
+    const delayDebounceFn = setTimeout(() => fetchLogs(), 500)
     return () => clearTimeout(delayDebounceFn)
   }, [searchTerm, filterLevel])
 
-  // Auto refresh every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get('http://localhost:8081/api/v1/logs/', {
+      axios.get('http://localhost:8000/api/v1/logs/', {
         params: { search: searchTerm, level: filterLevel }
       }).then(res => setLogs(res.data.logs))
     }, 5000)
@@ -40,7 +42,7 @@ const Logs = () => {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 animate-fadeIn">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-white">System Logs</h2>
             <span className="text-xs text-green-400 flex items-center">
@@ -53,7 +55,7 @@ const Logs = () => {
               <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
-                placeholder="Search logs by message or service..." 
+                placeholder="Search logs..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500" 
@@ -86,7 +88,7 @@ const Logs = () => {
                   <tr><td colSpan="4" className="text-center py-4 text-slate-500">No logs found</td></tr>
                 ) : (
                   logs.map((log, index) => (
-                    <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50">
+                    <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
                       <td className="px-4 py-3 text-xs text-slate-500">{new Date(log.timestamp).toLocaleTimeString()}</td>
                       <td className="px-4 py-3 font-medium">{log.service}</td>
                       <td className="px-4 py-3">

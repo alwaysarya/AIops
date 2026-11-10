@@ -11,7 +11,7 @@ services:
   ai-detector:
     build: ./services/ai-anomaly-detector
     ports:
-      - "8002:8001"  # Host port 8002, Container port 8001
+      - "8005:8001"  # Host port 8002, Container port 8001
 
   frontend:
     build: ./frontend

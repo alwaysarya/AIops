@@ -6,33 +6,36 @@ const Sidebar = () => {
   const location = useLocation()
 
   const getLinkClass = (path) => {
-    const baseClass = "flex items-center px-4 py-2 rounded-lg transition-colors mb-2 "
+    const baseClass = "flex items-center px-3 py-2 rounded-lg transition-all duration-200 mb-0.5 text-[13px] font-medium "
     return location.pathname === path 
-      ? baseClass + "bg-slate-700/50 text-white" 
-      : baseClass + "text-slate-400 hover:bg-slate-700/50 hover:text-slate-200"
+      ? baseClass + "bg-white/10 text-white shadow-sm" 
+      : baseClass + "text-gray-400 hover:bg-white/5 hover:text-gray-100"
   }
 
   return (
-    <aside className="w-64 bg-slate-800 border-r border-slate-700 flex-shrink-0 hidden md:block">
-      <div className="h-full flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-slate-700">
-          <span className="text-xl font-bold text-blue-400">AIOps Platform</span>
+    <aside className="w-[240px] apple-glass border-r border-white/5 flex-shrink-0 hidden md:flex flex-col relative z-40">
+      <div className="h-16 flex items-center px-6 border-b border-white/5">
+        <div className="flex items-center gap-2 text-white font-semibold tracking-tight text-lg">
+          AIOps <span className="text-gray-500 font-normal">Pro</span>
         </div>
-        <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-          <Link to="/" className={getLinkClass('/')}><LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard</Link>
-          <Link to="/logs" className={getLinkClass('/logs')}><Activity className="w-5 h-5 mr-3" /> Logs & Metrics</Link>
-          <Link to="/topology" className={getLinkClass('/topology')}><Map className="w-5 h-5 mr-3" /> Topology Map</Link>
-          <Link to="/rca" className={getLinkClass('/rca')}><Zap className="w-5 h-5 mr-3" /> Root Cause (RCA)</Link>
-          <Link to="/incidents" className={getLinkClass('/incidents')}><ShieldAlert className="w-5 h-5 mr-3" /> Incidents</Link>
-          <Link to="/alerts" className={getLinkClass('/alerts')}><AlertTriangle className="w-5 h-5 mr-3" /> Alerts</Link>
-          <Link to="/reports" className={getLinkClass('/reports')}><BarChart2 className="w-5 h-5 mr-3" /> Analytics & Reports</Link>
-        </nav>
-        <div className="p-4 border-t border-slate-700">
-          <Link to="/backup" className={getLinkClass('/backup')}><HardDrive className="w-5 h-5 mr-3" /> Backup & Restore</Link>
-          <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><Shield className="w-5 h-5 mr-3" /> Audit Logs</Link>
-          <Link to="/profile" className={getLinkClass('/profile')}><User className="w-5 h-5 mr-3" /> Profile</Link>
-          <Link to="/settings" className={getLinkClass('/settings')}><Settings className="w-5 h-5 mr-3" /> Settings</Link>
-        </div>
+      </div>
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 px-3">Overview</div>
+        <Link to="/" className={getLinkClass('/')}><LayoutDashboard className="w-4 h-4 mr-2.5" /> Dashboard</Link>
+        <Link to="/logs" className={getLinkClass('/logs')}><Activity className="w-4 h-4 mr-2.5" /> Live Logs</Link>
+        <Link to="/topology" className={getLinkClass('/topology')}><Map className="w-4 h-4 mr-2.5" /> Topology</Link>
+        <Link to="/alerts" className={getLinkClass('/alerts')}><AlertTriangle className="w-4 h-4 mr-2.5" /> Alerts</Link>
+        
+        <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-6 px-3">Intelligence</div>
+        <Link to="/rca" className={getLinkClass('/rca')}><Zap className="w-4 h-4 mr-2.5" /> Root Cause</Link>
+        <Link to="/reports" className={getLinkClass('/reports')}><BarChart2 className="w-4 h-4 mr-2.5" /> Analytics</Link>
+        <Link to="/incidents" className={getLinkClass('/incidents')}><ShieldAlert className="w-4 h-4 mr-2.5" /> Incidents</Link>
+      </nav>
+      <div className="p-3 border-t border-white/5 space-y-1">
+        <Link to="/backup" className={getLinkClass('/backup')}><HardDrive className="w-4 h-4 mr-2.5" /> Backup</Link>
+        <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><Shield className="w-4 h-4 mr-2.5" /> Audit Logs</Link>
+        <Link to="/profile" className={getLinkClass('/profile')}><User className="w-4 h-4 mr-2.5" /> Profile</Link>
+        <Link to="/settings" className={getLinkClass('/settings')}><Settings className="w-4 h-4 mr-2.5" /> Settings</Link>
       </div>
     </aside>
   )

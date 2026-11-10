@@ -1,31 +1,37 @@
 #!/bin/bash
+
 echo "🚀 Starting AIOps Platform..."
 
-# 1. Start Backend
+# 1. API Gateway (Backend)
 cd services/api-gateway
 export PYTHONPATH=.
-python src/main.py &
-GATEWAY_PID=$!
-echo "✅ API Gateway running (PID: $GATEWAY_PID)"
+python src/main.py > /tmp/gateway.log 2>&1 &
+echo "✅ API Gateway started (Port 8000)"
 
-# 2. Start AI Detector
+# 2. AI Detector
 cd ../ai-anomaly-detector
 export PYTHONPATH=.
-python src/main.py &
-AI_PID=$!
-echo "✅ AI Detector running (PID: $AI_PID)"
+python src/main.py > /tmp/ai.log 2>&1 &
+echo "✅ AI Detector started (Port 8001)"
 
-# 3. Start Log Generator
+# 3. Log Generator
 cd ../api-gateway
-python log_generator.py &
-LOG_PID=$!
-echo "✅ Log Generator running (PID: $LOG_PID)"
+python log_generator.py > /tmp/loggen.log 2>&1 &
+echo "✅ Log Generator started"
 
-# 4. Start Frontend
+# 4. Log Reader
+python log_reader.py > /tmp/logreader.log 2>&1 &
+echo "✅ Log Reader started"
+
+# 5. Frontend
 cd ../../frontend
-npm run dev &
-FRONTEND_PID=$!
-echo "✅ Frontend running (PID: $FRONTEND_PID)"
+npm run dev > /tmp/frontend.log 2>&1 &
+echo "✅ Frontend started (Port 3000)"
 
+echo ""
 echo "🎉 All services are running!"
+echo "🌐 Open Dashboard: http://localhost:3000"
+echo "🛑 Press Ctrl+C to stop all services."
+
+trap "echo 'Stopping all...'; kill $GATEWAY_PID $AI_PID $LOG_PID $READER_PID $FRONTEND_PID; exit" INT
 wait
