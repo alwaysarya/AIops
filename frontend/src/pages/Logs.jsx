@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Common/Sidebar'
 import Navbar from '../components/Common/Navbar'
-import { Search, Filter } from 'lucide-react'
+import { Search, Download } from 'lucide-react'
 import axios from 'axios'
 
 const Logs = () => {
@@ -10,10 +10,9 @@ const Logs = () => {
   const [filterLevel, setFilterLevel] = useState('ALL')
 
   useEffect(() => {
-    // Poll backend every 2 seconds for new logs
     const fetchLogs = () => {
       axios.get('http://localhost:8000/api/v1/logs/')
-        .then(res => setLogs(res.data.logs.reverse()))
+        .then(res => setLogs(res.data.logs))
         .catch(err => console.error(err))
     }
     fetchLogs()
@@ -28,6 +27,24 @@ const Logs = () => {
     return matchesSearch && matchesLevel
   })
 
+  // Export CSV Function
+  const exportToCSV = () => {
+    const headers = ['Timestamp', 'Service', 'Level', 'Message']
+    const csvRows = filteredLogs.map(log => 
+      `"${log.timestamp}","${log.service}","${log.level}","${log.message}"`
+    )
+    const csvContent = [headers.join(','), ...csvRows].join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'aiops_logs.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <div className="flex h-screen bg-slate-900">
       <Sidebar />
@@ -36,10 +53,12 @@ const Logs = () => {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-white">System Logs</h2>
-            <span className="text-green-400 text-sm flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-              Live Polling
-            </span>
+            <button 
+              onClick={exportToCSV}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center transition-colors"
+            >
+              <Download className="w-4 h-4 mr-2" /> Export to CSV
+            </button>
           </div>
 
           <div className="flex space-x-4 mb-4">
@@ -77,7 +96,7 @@ const Logs = () => {
               </thead>
               <tbody>
                 {filteredLogs.length === 0 ? (
-                  <tr><td colSpan="4" className="text-center py-4">Waiting for logs...</td></tr>
+                  <tr><td colSpan="4" className="text-center py-4">No logs found</td></tr>
                 ) : (
                   filteredLogs.map((log, index) => (
                     <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50">

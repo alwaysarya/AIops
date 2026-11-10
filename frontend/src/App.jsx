@@ -4,6 +4,8 @@ import Home from './pages/Home'
 import Logs from './pages/Logs'
 import Alerts from './pages/Alerts'
 import Settings from './pages/Settings'
+import RCA from './pages/RCA'
+import Topology from './pages/Topology'
 import Profile from './pages/Profile'
 
 function App() {
@@ -15,6 +17,8 @@ function App() {
           <Route path="/logs" element={<Logs />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/rca" element={<RCA />} />
+          <Route path="/topology" element={<Topology />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
