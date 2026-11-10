@@ -20,7 +20,7 @@ const ApiDocs = () => {
               Tera FastAPI auto-generated documentation yahan hai. Yahan se tu saare API endpoints (Logs, AI, Remediation) live test kar sakta hai.
             </p>
             <a 
-              href="http://localhost:8000/docs" 
+              href="http://localhost:8081/docs" 
               target="_blank" 
               rel="noreferrer"
               className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"

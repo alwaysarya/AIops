@@ -12,7 +12,7 @@ const Profile = () => {
   const handlePasswordChange = async (e) => {
     e.preventDefault()
     try {
-      await axios.post('http://localhost:8000/api/v1/profile/change-password/aryan', {
+      await axios.post('http://localhost:8081/api/v1/profile/change-password/aryan', {
         old_password: passwords.old,
         new_password: passwords.new
       })

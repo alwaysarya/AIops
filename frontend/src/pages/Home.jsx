@@ -22,13 +22,13 @@ const Home = () => {
   }, [timeRange])
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/v1/health/')
+    axios.get('http://localhost:8081/api/v1/health/')
       .then(response => setHealthData(response.data))
       .catch(() => setHealthData({ status: 'error' }))
 
     const interval = setInterval(async () => {
       try {
-        const res = await axios.post('http://localhost:8000/api/v1/ai/analyze', {
+        const res = await axios.post('http://localhost:8081/api/v1/ai/analyze', {
           service: "payment-service",
           level: Math.random() > 0.5 ? "ERROR" : "INFO",
           message: "Periodic check"

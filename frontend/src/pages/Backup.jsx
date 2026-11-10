@@ -11,7 +11,7 @@ const Backup = () => {
 
   const fetchBackups = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/v1/backup/list')
+      const res = await axios.get('http://localhost:8081/api/v1/backup/list')
       setBackups(res.data.backups)
     } catch (e) { console.error(e) }
   }
@@ -21,7 +21,7 @@ const Backup = () => {
   const handleBackup = async () => {
     setLoading(true)
     try {
-      const res = await axios.post('http://localhost:8000/api/v1/backup/create')
+      const res = await axios.post('http://localhost:8081/api/v1/backup/create')
       setMessage(`✅ Backup created: ${res.data.backup_name} (${res.data.size_kb})`)
       fetchBackups()
     } catch (e) {

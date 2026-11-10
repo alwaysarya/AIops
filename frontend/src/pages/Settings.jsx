@@ -1,16 +1,43 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Common/Sidebar'
 import Navbar from '../components/Common/Navbar'
 import { Save, Mail, Bell, Shield, UserPlus, Trash2 } from 'lucide-react'
+import axios from 'axios'
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('config')
-  const [settings, setSettings] = useState({ api_url: 'http://localhost:8000', kafka_url: 'localhost:9092', slack_webhook: '', email: '' })
+  const [settings, setSettings] = useState({ api_url: '', kafka_url: '', slack_webhook: '', alert_email: '' })
   const [users, setUsers] = useState([
     { id: 1, name: 'Aryan Thakur', email: 'aryan@aiops.com', role: 'Admin' },
     { id: 2, name: 'Rahul Sharma', email: 'rahul@aiops.com', role: 'Viewer' }
   ])
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Viewer' })
+  const [message, setMessage] = useState('')
+
+  // Load settings from DB on page load
+  useEffect(() => {
+    axios.get('http://localhost:8081/api/v1/settings/')
+      .then(res => setSettings(prev => ({ ...prev, ...res.data })))
+      .catch(err => console.error(err))
+  }, [])
+
+  const handleSaveConfig = async () => {
+    try {
+      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'api_url', value: settings.api_url })
+      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'kafka_url', value: settings.kafka_url })
+      setMessage('✅ Configuration saved successfully!')
+      setTimeout(() => setMessage(''), 3000)
+    } catch (e) { setMessage('❌ Error saving config') }
+  }
+
+  const handleSaveNotifications = async () => {
+    try {
+      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'slack_webhook', value: settings.slack_webhook })
+      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'alert_email', value: settings.alert_email })
+      setMessage('✅ Notification settings saved!')
+      setTimeout(() => setMessage(''), 3000)
+    } catch (e) { setMessage('❌ Error saving notifications') }
+  }
 
   const handleAddUser = () => {
     if (newUser.name && newUser.email) {
@@ -19,9 +46,7 @@ const Settings = () => {
     }
   }
 
-  const handleDeleteUser = (id) => {
-    setUsers(users.filter(u => u.id !== id))
-  }
+  const handleDeleteUser = (id) => setUsers(users.filter(u => u.id !== id))
 
   return (
     <div className="flex h-screen bg-slate-900">
@@ -36,6 +61,8 @@ const Settings = () => {
             <button onClick={() => setActiveTab('notifications')} className={`pb-2 px-1 font-medium ${activeTab === 'notifications' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'}`}>Notifications</button>
             <button onClick={() => setActiveTab('users')} className={`pb-2 px-1 font-medium ${activeTab === 'users' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'}`}>User Management (RBAC)</button>
           </div>
+
+          {message && <div className="mb-4 text-green-400 font-bold">{message}</div>}
           
           {activeTab === 'config' && (
             <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 max-w-2xl">
@@ -47,7 +74,7 @@ const Settings = () => {
                 <label className="block text-slate-400 text-sm font-bold mb-2">Kafka Bootstrap Servers</label>
                 <input type="text" value={settings.kafka_url} onChange={(e) => setSettings({...settings, kafka_url: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
               </div>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex items-center transition-colors">
+              <button onClick={handleSaveConfig} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex items-center transition-colors">
                 <Save className="w-4 h-4 mr-2" /> Save Config
               </button>
             </div>
@@ -59,7 +86,7 @@ const Settings = () => {
                 <Mail className="w-5 h-5 text-slate-400 mr-3" />
                 <div className="flex-1">
                   <label className="block text-slate-400 text-sm font-bold mb-2">Alert Email Address</label>
-                  <input type="email" placeholder="admin@company.com" value={settings.email} onChange={(e) => setSettings({...settings, email: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
+                  <input type="email" placeholder="admin@company.com" value={settings.alert_email} onChange={(e) => setSettings({...settings, alert_email: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
                 </div>
               </div>
               <div className="mb-6 flex items-center">
@@ -69,7 +96,7 @@ const Settings = () => {
                   <input type="text" placeholder="https://hooks.slack.com/..." value={settings.slack_webhook} onChange={(e) => setSettings({...settings, slack_webhook: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
                 </div>
               </div>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex items-center transition-colors">
+              <button onClick={handleSaveNotifications} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex items-center transition-colors">
                 <Save className="w-4 h-4 mr-2" /> Save Notifications
               </button>
             </div>

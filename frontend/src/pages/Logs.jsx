@@ -11,7 +11,7 @@ const Logs = () => {
 
   useEffect(() => {
     const fetchLogs = () => {
-      axios.get('http://localhost:8000/api/v1/logs/', {
+      axios.get('http://localhost:8081/api/v1/logs/', {
         params: { search: searchTerm, level: filterLevel }
       })
       .then(res => setLogs(res.data.logs))
@@ -28,7 +28,7 @@ const Logs = () => {
   // Auto refresh every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get('http://localhost:8000/api/v1/logs/', {
+      axios.get('http://localhost:8081/api/v1/logs/', {
         params: { search: searchTerm, level: filterLevel }
       }).then(res => setLogs(res.data.logs))
     }, 5000)

@@ -6,7 +6,7 @@ import axios from 'axios'
 
 const SystemHealth = () => {
   const [services, setServices] = useState([
-    { name: 'API Gateway', url: 'http://localhost:8000/api/v1/health/', icon: Server, status: 'checking' },
+    { name: 'API Gateway', url: 'http://localhost:8081/api/v1/health/', icon: Server, status: 'checking' },
     { name: 'AI Detector', url: 'http://localhost:8001/api/v1/health', icon: Activity, status: 'checking' },
     { name: 'Frontend', url: window.location.origin, icon: Database, status: 'up' }
   ])

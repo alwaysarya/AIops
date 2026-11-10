@@ -8,7 +8,7 @@ const SystemStatus = () => {
   useEffect(() => {
     const check = async () => {
       try {
-        await axios.get('http://localhost:8000/api/v1/health/')
+        await axios.get('http://localhost:8081/api/v1/health/')
         setStatus('All Systems Operational')
         setColor('bg-green-500')
       } catch (e) {

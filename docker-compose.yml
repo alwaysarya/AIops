@@ -4,37 +4,18 @@ services:
   api-gateway:
     build: ./services/api-gateway
     ports:
-      - "8000:8000"
+      - "8081:8000"  # Host port 8081, Container port 8000
     environment:
       - LOG_LEVEL=INFO
-      - PYTHONPATH=/app
-    volumes:
-      - ./services/api-gateway:/app
-      - /app/venv
-    command: python src/main.py
 
   ai-detector:
     build: ./services/ai-anomaly-detector
     ports:
-      - "8001:8001"
-    environment:
-      - PYTHONPATH=/app
-    volumes:
-      - ./services/ai-anomaly-detector:/app
+      - "8002:8001"  # Host port 8002, Container port 8001
 
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    stdin_open: true
-
-  log-generator:
-    build: ./services/api-gateway
-    volumes:
-      - ./services/api-gateway:/app
-    command: python log_generator.py
+      - "3002:80"    # Host port 3002, Container port 80
     depends_on:
       - api-gateway
