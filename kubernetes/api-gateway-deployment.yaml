@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: api-gateway
-        image: my-aiops-gateway:latest
+        image: aiops-api-gateway:latest
         ports:
         - containerPort: 8000
         env:
@@ -32,6 +32,6 @@ spec:
     app: api-gateway
   ports:
     - protocol: TCP
-      port: 80
+      port: 8000
       targetPort: 8000
-  type: LoadBalancer
+  type: ClusterIP
