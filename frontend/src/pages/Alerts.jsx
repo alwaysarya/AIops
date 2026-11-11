@@ -1,126 +1,127 @@
-import React, { useState } from 'react'
-
+import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
-import { AlertCircle, CheckCircle, Info, Filter, Wrench, Plus, X } from 'lucide-react'
+import Footer from '../components/Common/Footer'
+import { AlertCircle, CheckCircle, Info, Filter, Plus, X } from 'lucide-react'
+import axios from 'axios'
 
 const Alerts = () => {
+  const [alerts, setAlerts] = useState([])
   const [filter, setFilter] = useState('ALL')
-  const [fixStatus, setFixStatus] = useState({})
-  const [showCreateRule, setShowCreateRule] = useState(false)
-  const [newRule, setNewRule] = useState({ service: 'payment-service', level: 'ERROR', action: 'Slack' })
-  
-  const [allAlerts, setAllAlerts] = useState([
-    { id: 1, type: 'critical', title: 'High CPU Usage', desc: 'Node-01 is at 95% CPU utilization.', time: '2 mins ago', service: 'infra' },
-    { id: 2, type: 'warning', title: 'High Latency', desc: 'Payment service response time is above 2s.', time: '15 mins ago', service: 'payment-service' },
-    { id: 3, type: 'resolved', title: 'Pod Restarted', desc: 'Auto-remediation restarted auth-service pod.', time: '1 hour ago', service: 'auth-service' },
-    { id: 4, type: 'critical', title: 'Database Connection Failed', desc: 'Could not connect to PostgreSQL instance.', time: '5 mins ago', service: 'db' },
-    { id: 5, type: 'warning', title: 'Memory Leak Detected', desc: 'User service memory growing steadily.', time: '30 mins ago', service: 'user-service' }
-  ])
+  const [showModal, setShowModal] = useState(false)
+  const [newAlert, setNewAlert] = useState({ title: '', description: '', severity: 'warning', service: '' })
 
-  const filteredAlerts = filter === 'ALL' ? allAlerts : allAlerts.filter(a => a.type === filter.toLowerCase())
-
-  const handleAutoFix = async (alert) => {
-    setFixStatus(prev => ({ ...prev, [alert.id]: 'Fixing...' }))
-    setTimeout(() => {
-      setFixStatus(prev => ({ ...prev, [alert.id]: '✅ Fixed successfully!' }))
-      setAllAlerts(prev => prev.map(a => a.id === alert.id ? { ...a, type: 'resolved', title: a.title + ' (Resolved)' } : a))
-    }, 1500)
+  const fetchAlerts = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/v1/alerts/')
+      setAlerts(res.data.alerts)
+    } catch (e) { console.error(e) }
   }
 
-  const handleCreateRule = () => {
-    setAllAlerts([{ id: Date.now(), type: 'warning', title: `Custom Rule: ${newRule.service} ${newRule.level}`, desc: `Action: Send to ${newRule.action}`, time: 'Just now', service: newRule.service }, ...allAlerts])
-    setShowCreateRule(false)
+  useEffect(() => { 
+    fetchAlerts() 
+    const interval = setInterval(fetchAlerts, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleCreateAlert = async (e) => {
+    e.preventDefault()
+    try {
+      await axios.post('http://localhost:8000/api/v1/alerts/create', newAlert)
+      setShowModal(false)
+      setNewAlert({ title: '', description: '', severity: 'warning', service: '' })
+      fetchAlerts()
+    } catch (e) { console.error(e) }
   }
+
+  const filteredAlerts = filter === 'ALL' ? alerts : alerts.filter(a => a.severity === filter.toLowerCase())
 
   return (
-    <div className="flex h-screen bg-slate-900">
-      
+    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-white">Alert Management</h2>
-            <div className="flex space-x-4">
-              <button onClick={() => setShowCreateRule(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center transition-colors">
-                <Plus className="w-4 h-4 mr-2" /> Create Alert Rule
-              </button>
-              <div className="relative">
-                <Filter className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                <select value={filter} onChange={(e) => setFilter(e.target.value)} className="bg-slate-800 text-white border border-slate-700 rounded-lg pl-10 pr-8 py-2 outline-none appearance-none cursor-pointer">
-                  <option value="ALL">All Alerts</option>
-                  <option value="CRITICAL">Critical</option>
-                  <option value="WARNING">Warning</option>
-                  <option value="RESOLVED">Resolved</option>
-                </select>
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-[1400px] mx-auto">
+            
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-3xl font-semibold text-white tracking-tight">Alert Management</h1>
+                <p className="text-zinc-400 text-sm mt-1">Monitor and respond to system incidents.</p>
               </div>
-            </div>
-          </div>
-
-          {/* Create Alert Rule Modal */}
-          {showCreateRule && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 w-96 shadow-2xl">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-bold text-white">Create Custom Alert Rule</h3>
-                  <button onClick={() => setShowCreateRule(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-slate-400 text-sm mb-1">Target Service</label>
-                    <input type="text" value={newRule.service} onChange={(e) => setNewRule({...newRule, service: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-slate-400 text-sm mb-1">Condition (Log Level)</label>
-                    <select value={newRule.level} onChange={(e) => setNewRule({...newRule, level: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none">
-                      <option value="ERROR">ERROR</option>
-                      <option value="WARNING">WARNING</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-slate-400 text-sm mb-1">Action</label>
-                    <select value={newRule.action} onChange={(e) => setNewRule({...newRule, action: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none">
-                      <option value="Slack">Send Slack Message</option>
-                      <option value="Email">Send Email</option>
-                      <option value="Auto-Fix">Trigger Auto-Fix</option>
-                    </select>
-                  </div>
-                  <button onClick={handleCreateRule} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded mt-2">Create Rule</button>
+              <div className="flex space-x-4">
+                <button onClick={() => setShowModal(true)} className="bg-white text-black font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                  <Plus className="w-4 h-4 mr-2" /> Create Alert
+                </button>
+                <div className="relative">
+                  <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400" />
+                  <select value={filter} onChange={(e) => setFilter(e.target.value)} className="bg-[#0A0A0A] text-white border border-white/10 rounded-xl pl-9 pr-8 py-2.5 outline-none appearance-none cursor-pointer hover:border-white/20 transition-colors">
+                    <option value="ALL">All Severities</option>
+                    <option value="CRITICAL">Critical</option>
+                    <option value="WARNING">Warning</option>
+                  </select>
                 </div>
               </div>
             </div>
-          )}
 
-          <div className="space-y-4">
-            {filteredAlerts.map((alert) => (
-              <div key={alert.id} className={`bg-slate-800 border rounded-lg p-4 flex justify-between items-center ${alert.type === 'critical' ? 'border-red-500/50' : alert.type === 'warning' ? 'border-yellow-500/50' : 'border-green-500/50'}`}>
-                <div className="flex items-start space-x-4">
-                  <div className={`mt-1 ${alert.type === 'critical' ? 'text-red-400' : alert.type === 'warning' ? 'text-yellow-400' : 'text-green-400'}`}>
-                    {alert.type === 'critical' ? <AlertCircle className="w-6 h-6" /> : alert.type === 'warning' ? <Info className="w-6 h-6" /> : <CheckCircle className="w-6 h-6" />}
-                  </div>
-                  <div>
-                    <h3 className={`font-bold ${alert.type === 'critical' ? 'text-red-400' : alert.type === 'warning' ? 'text-yellow-400' : 'text-green-400'}`}>{alert.title}</h3>
-                    <p className="text-slate-400 text-sm mt-1">{alert.desc}</p>
-                    <div className="flex space-x-4 mt-2 text-xs text-slate-500">
-                      <span>Service: {alert.service}</span>
-                      <span>{alert.time}</span>
+            {/* Alerts List */}
+            <div className="space-y-4">
+              {filteredAlerts.length === 0 ? (
+                <div className="text-center py-12 text-zinc-500 glass-card rounded-2xl">No alerts found.</div>
+              ) : (
+                filteredAlerts.map((alert) => (
+                  <div key={alert.id} className={`glass-card rounded-2xl p-5 flex justify-between items-center border-l-4 ${
+                    alert.severity === 'critical' ? 'border-l-red-500' : 
+                    alert.severity === 'warning' ? 'border-l-yellow-500' : 'border-l-blue-500'
+                  }`}>
+                    <div className="flex items-start space-x-4">
+                      <div className={`mt-1 ${alert.severity === 'critical' ? 'text-red-400' : alert.severity === 'warning' ? 'text-yellow-400' : 'text-blue-400'}`}>
+                        {alert.severity === 'critical' ? <AlertCircle className="w-6 h-6" /> : <Info className="w-6 h-6" />}
+                      </div>
+                      <div>
+                        <h3 className="text-white font-medium text-lg">{alert.title}</h3>
+                        <p className="text-zinc-400 text-sm mt-1">{alert.description}</p>
+                        <div className="flex space-x-4 mt-2 text-xs text-zinc-500">
+                          <span>Service: {alert.service}</span>
+                          <span>{new Date(alert.timestamp).toLocaleString()}</span>
+                        </div>
+                      </div>
                     </div>
+                    <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
+                      alert.severity === 'critical' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
+                      alert.severity === 'warning' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' : 
+                      'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                    }`}>
+                      {alert.severity}
+                    </span>
                   </div>
-                </div>
-                <div className="flex flex-col items-end space-y-2">
-                  {alert.type !== 'resolved' && (
-                    <button onClick={() => handleAutoFix(alert)} className="flex items-center text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded transition-colors">
-                      <Wrench className="w-3 h-3 mr-1" /> Auto-Fix
-                    </button>
-                  )}
-                  {fixStatus[alert.id] && (
-                    <span className={`text-xs font-bold ${fixStatus[alert.id].includes('✅') ? 'text-green-400' : 'text-red-400'}`}>{fixStatus[alert.id]}</span>
-                  )}
-                </div>
-              </div>
-            ))}
+                ))
+              )}
+            </div>
           </div>
         </main>
+        <Footer />
       </div>
+
+      {/* Create Alert Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#0A0A0A] p-6 rounded-2xl border border-white/10 w-[500px] shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold text-white">Create New Alert</h3>
+              <button onClick={() => setShowModal(false)} className="text-zinc-400 hover:text-white"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleCreateAlert} className="space-y-4">
+              <input type="text" placeholder="Alert Title" required value={newAlert.title} onChange={(e) => setNewAlert({...newAlert, title: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="text" placeholder="Description" required value={newAlert.description} onChange={(e) => setNewAlert({...newAlert, description: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="text" placeholder="Service Name" required value={newAlert.service} onChange={(e) => setNewAlert({...newAlert, service: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <select value={newAlert.severity} onChange={(e) => setNewAlert({...newAlert, severity: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                <option value="critical">Critical</option>
+                <option value="warning">Warning</option>
+              </select>
+              <button type="submit" className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors mt-2">Create Alert</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
