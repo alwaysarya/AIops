@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut } from 'lucide-react'
+import Logo from './Logo'
 
 const TopNavbar = () => {
   const location = useLocation()
@@ -10,7 +11,6 @@ const TopNavbar = () => {
   const moreMenuRef = useRef()
   const profileMenuRef = useRef()
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
@@ -30,7 +30,6 @@ const TopNavbar = () => {
     { path: '/alerts', label: 'Alerts', icon: AlertTriangle },
   ]
 
-  // Only system/intelligence links here, NO Profile/Settings
   const dropdownLinks = [
     { path: '/topology', label: 'Topology', icon: Map },
     { path: '/rca', label: 'Root Cause (AI)', icon: Zap },
@@ -45,10 +44,10 @@ const TopNavbar = () => {
       
       {/* Left Side: Logo + Main Links */}
       <div className="flex items-center space-x-10">
-        <Link to="/" className="flex items-center gap-2 text-white font-semibold text-xl tracking-tight">
-          <div className="w-8 h-8 rounded-full bg-[#151515] border border-white/20 flex items-center justify-center">
-            <div className="w-4 h-4 rounded-full bg-[#8b5cf6]"></div>
-          </div>
+        
+        {/* Logo Section */}
+        <Link to="/" className="flex items-center gap-3 text-white font-semibold text-xl tracking-tight">
+          <Logo className="w-10 h-10" />
           OpsMind
         </Link>
         
