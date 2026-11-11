@@ -3,7 +3,7 @@ import Sidebar from '../components/Common/Sidebar'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
-import { Play, UserPlus, Link as LinkIcon, CheckCircle } from 'lucide-react'
+import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, Activity, DollarSign, Server } from 'lucide-react'
 
 const Home = () => {
   const [stats, setStats] = useState(null)
@@ -30,6 +30,7 @@ const Home = () => {
         <main className="flex-1 overflow-y-auto p-8">
           <div className="max-w-[1400px] mx-auto">
             
+            {/* Header + Quick Actions */}
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h1 className="text-3xl font-semibold text-white">Welcome Back, Aryan</h1>
@@ -38,11 +39,11 @@ const Home = () => {
               <div className="flex space-x-3">
                 <button className="bg-[#151515] border border-white/10 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-white/5"><UserPlus className="w-4 h-4 mr-2"/> New Agent</button>
                 <button className="bg-[#151515] border border-white/10 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-white/5"><LinkIcon className="w-4 h-4 mr-2"/> Connect Data</button>
-                <button className="bg-yellow-400 text-black font-bold px-5 py-2.5 rounded-xl hover:bg-yellow-500 flex items-center"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
+                <button onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))} className="bg-yellow-400 text-black font-bold px-5 py-2.5 rounded-xl hover:bg-yellow-500 flex items-center"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
               </div>
             </div>
 
-            {/* Real KPI Cards */}
+            {/* Top KPI Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <p className="text-zinc-400 text-sm">Success Rate</p>
@@ -66,6 +67,7 @@ const Home = () => {
               </div>
             </div>
 
+            {/* Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
               {/* Cost Forecast */}
@@ -106,11 +108,11 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Live Runs Stream (Real Data) */}
+              {/* Live Runs Stream */}
               <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-white font-medium">Live Runs Stream</h3>
-                  <span className="text-xs text-zinc-500">Last 50</span>
+                  <span className="text-xs text-zinc-500">Real Services</span>
                 </div>
                 <table className="w-full text-left text-sm">
                   <thead className="text-xs text-zinc-500 uppercase border-b border-white/10">
