@@ -9,3 +9,7 @@ dist/
 .env
 venv/
 node_modules/
+.env
+services/api-gateway/.env
+.env
+services/api-gateway/.env
