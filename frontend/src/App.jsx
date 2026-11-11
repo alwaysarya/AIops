@@ -15,6 +15,7 @@ import Login from './pages/Login'
 import Organizations from './pages/Organizations'
 import Security from './pages/Security'
 import FinOps from './pages/FinOps'
+import Approvals from './pages/Approvals'
 import Copilot from './components/Common/Copilot'
 import CommandPalette from './components/Common/CommandPalette'
 
@@ -43,6 +44,7 @@ function App() {
           <Route path="/organizations" element={<ProtectedRoute><Organizations /></ProtectedRoute>} />
           <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
           <Route path="/finops" element={<ProtectedRoute><FinOps /></ProtectedRoute>} />
+          <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
         </Routes>
         <Copilot />
         <CommandPalette />

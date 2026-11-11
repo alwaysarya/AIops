@@ -86,3 +86,9 @@ from src.routes import notifications_ws
 app.include_router(notifications_ws.router, prefix="/api/v1/notifications", tags=["Notifications WS"])
 
 from src.routes import settings
+
+from src.routes import predictions
+app.include_router(predictions.router, prefix="/api/v1/predictions", tags=["Predictions"])
+
+from src.routes import runbooks
+app.include_router(runbooks.router, prefix="/api/v1/runbooks", tags=["Runbooks"])
