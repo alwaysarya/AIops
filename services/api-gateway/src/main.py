@@ -43,3 +43,6 @@ app.include_router(backup.router, prefix="/api/v1/backup", tags=["Backup"])
 
 from src.routes import organizations
 app.include_router(organizations.router, prefix="/api/v1/orgs", tags=["Organizations"])
+
+from src.routes import k8s
+app.include_router(k8s.router, prefix="/api/v1/k8s", tags=["Kubernetes"])

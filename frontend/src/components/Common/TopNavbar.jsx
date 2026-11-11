@@ -135,7 +135,7 @@ const TopNavbar = () => {
                 <Settings className="w-4 h-4" /><span>Settings</span>
               </Link>
               <div className="h-px bg-white/5 my-1"></div>
-              <button className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
+              <button onClick={() => { localStorage.removeItem("token"); localStorage.removeItem("org_id"); window.location.href = "/login"; }} className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
                 <LogOut className="w-4 h-4" /><span>Log out</span>
               </button>
             </div>
