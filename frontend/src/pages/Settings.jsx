@@ -6,12 +6,18 @@ import axios from 'axios'
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('config')
-  const [settings, setSettings] = useState({ api_url: 'http://localhost:8000', kafka_url: 'localhost:9092', slack_webhook: '', alert_email: '' })
+  const [settings, setSettings] = useState({ api_url: '', kafka_url: '', slack_webhook: '', alert_email: '' })
   const [users, setUsers] = useState([])
   const [newUser, setNewUser] = useState({ username: '', password: '', role: 'Viewer' })
   const [message, setMessage] = useState('')
 
-  // Fetch real users from database
+  // Load settings from DB on page load
+  useEffect(() => {
+    axios.get('http://localhost:8000/api/v1/settings/')
+      .then(res => setSettings(prev => ({ ...prev, ...res.data })))
+      .catch(err => console.error(err))
+  }, [])
+
   const fetchUsers = async () => {
     try {
       const res = await axios.get('http://localhost:8000/api/v1/users/list')
@@ -21,17 +27,22 @@ const Settings = () => {
 
   useEffect(() => { fetchUsers() }, [])
 
-  const handleSaveConfig = () => {
-    setMessage('✅ Configuration saved successfully!')
-    setTimeout(() => setMessage(''), 3000)
+  const handleSaveConfig = async () => {
+    try {
+      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'api_url', value: settings.api_url })
+      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'kafka_url', value: settings.kafka_url })
+      setMessage('✅ Configuration saved successfully!')
+      setTimeout(() => setMessage(''), 3000)
+    } catch (e) { setMessage('❌ Error saving config') }
   }
 
-  const handleTestNotification = async () => {
+  const handleSaveNotifications = async () => {
     try {
-      const res = await axios.post('http://localhost:8000/api/v1/notifications/test-alert')
-      setMessage(`✅ Notification Triggered: ${res.data.message}`)
-      setTimeout(() => setMessage(''), 5000)
-    } catch (e) { setMessage('❌ Failed to trigger notification') }
+      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'slack_webhook', value: settings.slack_webhook })
+      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'alert_email', value: settings.alert_email })
+      setMessage('✅ Notification settings saved!')
+      setTimeout(() => setMessage(''), 3000)
+    } catch (e) { setMessage('❌ Error saving notifications') }
   }
 
   const handleAddUser = async (e) => {
@@ -58,7 +69,7 @@ const Settings = () => {
             <div className="flex space-x-6 mb-8 border-b border-white/10">
               <button onClick={() => setActiveTab('config')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'config' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>System Config</button>
               <button onClick={() => setActiveTab('notifications')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'notifications' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Notifications</button>
-              <button onClick={() => setActiveTab('users')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'users' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>User Management (RBAC)</button>
+              <button onClick={() => setActiveTab('users')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'users' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>User Management</button>
             </div>
 
             {message && <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm font-medium">{message}</div>}
@@ -93,11 +104,8 @@ const Settings = () => {
                   </div>
                 </div>
                 <div className="flex space-x-4 mt-8 pt-6 border-t border-white/5">
-                  <button onClick={handleSaveConfig} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                  <button onClick={handleSaveNotifications} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
                     <Save className="w-4 h-4 mr-2" /> Save Notifications
-                  </button>
-                  <button onClick={handleTestNotification} className="bg-white/10 text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/20 transition-colors flex items-center">
-                    Test Notification
                   </button>
                 </div>
               </div>

@@ -84,3 +84,5 @@ app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 
 from src.routes import notifications_ws
 app.include_router(notifications_ws.router, prefix="/api/v1/notifications", tags=["Notifications WS"])
+
+from src.routes import settings
