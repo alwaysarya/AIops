@@ -66,3 +66,6 @@ app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytic
 
 from src.routes import copilot
 app.include_router(copilot.router, prefix="/api/v1/copilot", tags=["Copilot"])
+
+from src.routes import incidents
+app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["Incidents"])
