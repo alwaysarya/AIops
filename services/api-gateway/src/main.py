@@ -78,3 +78,6 @@ app.include_router(finops.router, prefix="/api/v1/finops", tags=["FinOps"])
 
 from src.routes import notifications
 app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["Notifications"])
+
+from src.routes import users
+app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
