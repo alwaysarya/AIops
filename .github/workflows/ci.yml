@@ -40,6 +40,11 @@ jobs:
       run: |
         cd frontend
         npm install --legacy-peer-deps
+        npm install -D @testing-library/dom --legacy-peer-deps
+    - name: Run Frontend Tests
+      run: |
+        cd frontend
+        npm test
     - name: Build Frontend
       run: |
         cd frontend
