@@ -2,40 +2,29 @@
 
 echo "🚀 Starting AIOps Platform..."
 
-# 1. API Gateway
 cd services/api-gateway
 export PYTHONPATH=.
 python src/main.py > /tmp/gateway.log 2>&1 &
 echo "✅ API Gateway started (Port 8000)"
 
-# 2. AI Detector
 cd ../ai-anomaly-detector
 export PYTHONPATH=.
 python src/main.py > /tmp/ai.log 2>&1 &
 echo "✅ AI Detector started (Port 8001)"
 
-# 3. Log Generator
 cd ../api-gateway
 python log_generator.py > /tmp/loggen.log 2>&1 &
-echo "✅ Log Generator started"
-
-# 4. Log Reader
 python log_reader.py > /tmp/logreader.log 2>&1 &
-echo "✅ Log Reader started"
-
-# 5. Log Ingester (NEW)
 python log_ingester.py > /tmp/logingester.log 2>&1 &
-echo "✅ Log Ingester started"
+python system_log_reader.py > /tmp/syslogreader.log 2>&1 &
+echo "✅ All Log Services started"
 
-# 6. Frontend
 cd ../../frontend
 npm run dev > /tmp/frontend.log 2>&1 &
 echo "✅ Frontend started (Port 3000)"
 
-echo ""
 echo "🎉 All services are running!"
 echo "🌐 Open Dashboard: http://localhost:3000"
-echo "🛑 Press Ctrl+C to stop all services."
 
-trap "echo 'Stopping all...'; kill $GATEWAY_PID $AI_PID $LOG_PID $READER_PID $INGESTER_PID $FRONTEND_PID; exit" INT
+trap "echo 'Stopping all...'; kill %1 %2 %3 %4 %5 %6 %7; exit" INT
 wait
