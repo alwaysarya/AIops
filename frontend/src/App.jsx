@@ -16,6 +16,7 @@ import Organizations from './pages/Organizations'
 import Security from './pages/Security'
 import FinOps from './pages/FinOps'
 import Copilot from './components/Common/Copilot'
+import CommandPalette from './components/Common/CommandPalette'
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token')
@@ -44,6 +45,7 @@ function App() {
           <Route path="/finops" element={<ProtectedRoute><FinOps /></ProtectedRoute>} />
         </Routes>
         <Copilot />
+        <CommandPalette />
       </div>
     </Router>
   )
