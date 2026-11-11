@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from src.database import get_db_connection
+from datetime import datetime
 import shutil
 import os
-from datetime import datetime
 
 router = APIRouter()
 
@@ -15,16 +15,13 @@ async def create_backup():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_path = f"{BACKUP_DIR}/aiops_backup_{timestamp}.db"
         
-        # Copy database file
         if os.path.exists("aiops.db"):
             shutil.copy("aiops.db", backup_path)
             size = os.path.getsize(backup_path) / 1024
             return {
                 "status": "success",
-                "message": "Backup created successfully",
                 "backup_name": f"aiops_backup_{timestamp}.db",
-                "size_kb": f"{size:.2f} KB",
-                "path": backup_path
+                "size_kb": f"{size:.2f} KB"
             }
         else:
             raise HTTPException(status_code=404, detail="Database not found")
