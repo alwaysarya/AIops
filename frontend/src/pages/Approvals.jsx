@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
-import { CheckCircle, Clock, XCircle } from 'lucide-react'
+import { CheckCircle, Clock } from 'lucide-react'
 import axios from 'axios'
 
 const Approvals = () => {
