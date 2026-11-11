@@ -52,3 +52,6 @@ from src.routes import alerts
 from src.routes import ai_proxy
 
 from src.routes import websocket
+
+from src.routes import rca
+app.include_router(rca.router, prefix="/api/v1/rca", tags=["RCA"])

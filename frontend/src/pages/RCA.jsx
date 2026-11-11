@@ -1,125 +1,112 @@
 import React, { useState } from 'react'
-
 import TopNavbar from '../components/Common/TopNavbar'
-import { Activity, Server, Database, Network, AlertTriangle } from 'lucide-react'
+import Footer from '../components/Common/Footer'
+import { Brain, TrendingUp, Server, AlertTriangle, CheckCircle, Activity } from 'lucide-react'
+import axios from 'axios'
 
 const RCA = () => {
+  const [service, setService] = useState('payment-service')
   const [loading, setLoading] = useState(false)
-  const [analysis, setAnalysis] = useState(null)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
 
-  const runAnalysis = () => {
+  const runAnalysis = async (e) => {
+    e.preventDefault()
     setLoading(true)
-    setAnalysis(null)
-    // Simulate AI Root Cause Analysis
-    setTimeout(() => {
-      setAnalysis({
-        issue: "High Latency in Payment Service",
-        rootCause: "Database Connection Pool Exhaustion",
-        confidence: "94%",
-        impactedServices: ["payment-service", "checkout-service"],
-        dependencyChain: [
-          { name: "Frontend", status: "healthy", icon: Network },
-          { name: "Payment Service", status: "critical", icon: Server },
-          { name: "PostgreSQL DB", status: "warning", icon: Database },
-        ],
-        recommendation: "Increase DB max_connections from 100 to 200 and restart the payment service pods."
-      })
+    setError('')
+    setResult(null)
+    
+    try {
+      const res = await axios.post('http://localhost:8000/api/v1/rca/analyze', { service })
+      setResult(res.data)
+    } catch (err) {
+      setError('Failed to analyze. Check backend connection.')
+    } finally {
       setLoading(false)
-    }, 2000)
+    }
   }
 
   return (
-    <div className="flex h-screen bg-slate-900">
-      
+    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-white">AI Root Cause Analysis (RCA)</h2>
-            <button 
-              onClick={runAnalysis}
-              disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium flex items-center transition-colors disabled:opacity-50"
-            >
-              <Activity className="w-5 h-5 mr-2" /> 
-              {loading ? 'Analyzing System...' : 'Run Analysis'}
-            </button>
-          </div>
-
-          {!analysis && !loading && (
-            <div className="flex flex-col items-center justify-center h-[60vh] text-slate-500">
-              <Server className="w-16 h-16 mb-4 opacity-50" />
-              <p className="text-lg">Click "Run Analysis" to detect root causes using AI.</p>
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-[1000px] mx-auto">
+            
+            <div className="mb-8">
+              <h1 className="text-3xl font-semibold text-white tracking-tight">AI Root Cause Analysis</h1>
+              <p className="text-zinc-400 text-sm mt-1">Analyze logs and infrastructure to detect the probable root cause.</p>
             </div>
-          )}
 
-          {loading && (
-            <div className="flex flex-col items-center justify-center h-[60vh]">
-              <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-purple-400 font-medium animate-pulse">Scanning dependency graphs and logs...</p>
+            {/* Input Form */}
+            <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 mb-8">
+              <form onSubmit={runAnalysis} className="flex space-x-4">
+                <select 
+                  value={service} 
+                  onChange={(e) => setService(e.target.value)}
+                  className="flex-1 bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
+                >
+                  <option value="payment-service">payment-service</option>
+                  <option value="auth-service">auth-service</option>
+                  <option value="user-service">user-service</option>
+                  <option value="api-gateway">api-gateway</option>
+                </select>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="bg-white text-black font-semibold px-8 py-3 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center"
+                >
+                  {loading ? 'Analyzing...' : 'Run Analysis'}
+                </button>
+              </form>
             </div>
-          )}
 
-          {analysis && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main Result Card */}
-              <div className="lg:col-span-2 bg-slate-800 rounded-lg p-6 border border-slate-700">
-                <div className="flex items-start space-x-4 mb-6">
-                  <div className="p-3 bg-red-500/20 rounded-lg text-red-400">
-                    <AlertTriangle className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white">{analysis.issue}</h3>
-                    <p className="text-red-400 font-medium">Root Cause: {analysis.rootCause}</p>
-                  </div>
-                </div>
+            {error && <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl mb-8">{error}</div>}
 
-                <div className="bg-slate-900 p-4 rounded-lg border border-slate-700 mb-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-slate-400">AI Confidence Score</span>
-                    <span className="text-green-400 font-bold">{analysis.confidence}</span>
+            {/* Results */}
+            {result && (
+              <div className="space-y-6">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Brain className="w-32 h-32 text-purple-500" />
                   </div>
-                  <div className="w-full bg-slate-700 rounded-full h-2">
-                    <div className="bg-green-500 h-2 rounded-full" style={{ width: analysis.confidence }}></div>
-                  </div>
-                </div>
+                  <div className="relative z-10">
+                    <span className="px-3 py-1 bg-purple-500/10 text-purple-400 text-xs font-bold rounded-md border border-purple-500/20 uppercase tracking-wider mb-4 inline-block">AI Analysis Complete</span>
+                    <h2 className="text-2xl font-semibold text-white mb-2">{result.service}</h2>
+                    <p className="text-zinc-400 text-sm mb-6">Analyzed {result.analyzed_logs} recent log entries.</p>
+                    
+                    <div className="bg-[#111113] rounded-xl p-5 border border-white/5 mb-6">
+                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Probable Root Cause</h3>
+                      <p className="text-lg text-white font-medium">{result.root_cause}</p>
+                    </div>
 
-                <div>
-                  <h4 className="text-slate-300 font-medium mb-3">Recommended Fix</h4>
-                  <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg text-blue-300 text-sm">
-                    {analysis.recommendation}
-                  </div>
-                </div>
-              </div>
-
-              {/* Dependency Graph */}
-              <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-                <h4 className="text-slate-300 font-medium mb-4">Dependency Chain</h4>
-                <div className="space-y-4">
-                  {analysis.dependencyChain.map((node, i) => (
-                    <div key={i} className="flex items-center">
-                      <div className={`p-2 rounded-full mr-3 ${
-                        node.status === 'critical' ? 'bg-red-500/20 text-red-400' : 
-                        node.status === 'warning' ? 'bg-yellow-500/20 text-yellow-400' : 
-                        'bg-green-500/20 text-green-400'
-                      }`}>
-                        <node.icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-white">{node.name}</p>
-                        <p className={`text-xs uppercase ${
-                          node.status === 'critical' ? 'text-red-400' : 
-                          node.status === 'warning' ? 'text-yellow-400' : 
-                          'text-green-400'
-                        }`}>{node.status}</p>
+                    <div className="flex items-center space-x-6">
+                      <div>
+                        <h3 className="text-xs font-medium text-zinc-500 uppercase">Confidence Score</h3>
+                        <div className="flex items-center mt-1">
+                          <span className={`text-2xl font-bold ${result.confidence > 80 ? 'text-green-400' : 'text-yellow-400'}`}>{result.confidence}%</span>
+                          <TrendingUp className="w-4 h-4 ml-2 text-green-400" />
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                </div>
+
+                {/* Recommendation */}
+                <div className="bg-gradient-to-r from-blue-900/20 to-transparent border border-blue-500/20 rounded-2xl p-6">
+                  <h3 className="text-blue-400 font-medium flex items-center mb-2">
+                    <Activity className="w-5 h-5 mr-2" /> Recommended Remediation
+                  </h3>
+                  <p className="text-white text-lg">{result.recommendation}</p>
+                  <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition-colors text-sm">
+                    Apply Auto-Fix
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </main>
+        <Footer />
       </div>
     </div>
   )
