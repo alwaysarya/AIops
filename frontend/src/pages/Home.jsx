@@ -3,11 +3,14 @@ import Sidebar from '../components/Common/Sidebar'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
-import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, ArrowDownRight, ClipboardCheck, Layout, MoreHorizontal } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, ArrowDownRight, ClipboardCheck, Layout, MoreHorizontal, X } from 'lucide-react'
 
 const Home = () => {
   const [stats, setStats] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [showDemoModal, setShowDemoModal] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetch = () => axios.get('http://localhost:8000/api/v1/dashboard/stats').then(r => setStats(r.data)).catch(e => console.error(e))
@@ -16,8 +19,9 @@ const Home = () => {
   if (!stats) return <div className="flex h-screen bg-[#030303] text-white items-center justify-center">Loading Real Data...</div>
 
   return (
-    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
+    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden relative">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar setIsOpen={setIsSidebarOpen} />
         <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 lg:pb-8">
@@ -29,15 +33,24 @@ const Home = () => {
                 <p className="text-zinc-400 text-xs lg:text-sm mt-1">Your AI control room — monitoring agents, costs, and compliance.</p>
               </div>
               
-              {/* Quick Actions optimized for mobile touch */}
               <div className="grid grid-cols-4 lg:flex items-center gap-2 lg:gap-3 w-full lg:w-auto">
-                {[{icon: UserPlus, label: 'New Agent'}, {icon: LinkIcon, label: 'Connect Data'}, {icon: ClipboardCheck, label: 'Review Approval'}, {icon: Layout, label: 'View Workspace'}].map((item, i) => (
-                  <div key={i} className="flex flex-col items-center text-zinc-400 hover:text-white cursor-pointer py-1">
-                    <div className="w-10 h-10 lg:w-8 lg:h-8 rounded bg-[#151515] border border-white/10 flex items-center justify-center mb-1"><item.icon className="w-4 h-4 lg:w-4 lg:h-4" /></div>
-                    <span className="text-[9px] lg:text-[10px] text-center leading-tight">{item.label}</span>
-                  </div>
-                ))}
-                <button className="col-span-4 lg:col-span-1 mt-2 lg:mt-0 bg-yellow-400 text-black font-bold px-4 lg:px-5 py-3 lg:py-2 rounded-lg hover:bg-yellow-500 flex items-center justify-center lg:ml-2 h-10 lg:h-9 text-xs lg:text-sm w-full"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
+                <div onClick={() => navigate('/new-agent')} className="flex flex-col items-center text-zinc-400 hover:text-white cursor-pointer py-1">
+                  <div className="w-10 h-10 lg:w-8 lg:h-8 rounded bg-[#151515] border border-white/10 flex items-center justify-center mb-1"><UserPlus className="w-4 h-4" /></div>
+                  <span className="text-[9px] lg:text-[10px] text-center">New Agent</span>
+                </div>
+                <div onClick={() => navigate('/connect-data')} className="flex flex-col items-center text-zinc-400 hover:text-white cursor-pointer py-1">
+                  <div className="w-10 h-10 lg:w-8 lg:h-8 rounded bg-[#151515] border border-white/10 flex items-center justify-center mb-1"><LinkIcon className="w-4 h-4" /></div>
+                  <span className="text-[9px] lg:text-[10px] text-center">Connect Data</span>
+                </div>
+                <div onClick={() => navigate('/approvals')} className="flex flex-col items-center text-zinc-400 hover:text-white cursor-pointer py-1">
+                  <div className="w-10 h-10 lg:w-8 lg:h-8 rounded bg-[#151515] border border-white/10 flex items-center justify-center mb-1"><ClipboardCheck className="w-4 h-4" /></div>
+                  <span className="text-[9px] lg:text-[10px] text-center">Review Approval</span>
+                </div>
+                <div onClick={() => navigate('/workspace')} className="flex flex-col items-center text-zinc-400 hover:text-white cursor-pointer py-1">
+                  <div className="w-10 h-10 lg:w-8 lg:h-8 rounded bg-[#151515] border border-white/10 flex items-center justify-center mb-1"><Layout className="w-4 h-4" /></div>
+                  <span className="text-[9px] lg:text-[10px] text-center">View Workspace</span>
+                </div>
+                <button onClick={() => setShowDemoModal(true)} className="col-span-4 lg:col-span-1 mt-2 lg:mt-0 bg-yellow-400 text-black font-bold px-4 lg:px-5 py-3 lg:py-2 rounded-lg hover:bg-yellow-500 flex items-center justify-center lg:ml-2 h-10 lg:h-9 text-xs lg:text-sm w-full"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
               </div>
             </div>
 
@@ -81,10 +94,8 @@ const Home = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5">
-              
               <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5">
                 <div className="flex justify-between items-center mb-4"><h3 className="text-white font-medium flex items-center"><span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>Live Runs Stream</h3><span className="text-[10px] text-zinc-500">Last 50</span></div>
-                
                 <table className="w-full text-left text-xs hidden sm:table">
                   <thead className="text-[10px] text-zinc-500 uppercase border-b border-white/10"><tr><th className="pb-3">Name</th><th className="pb-3">Time</th><th className="pb-3">Latency</th><th className="pb-3">Status</th></tr></thead>
                   <tbody>
@@ -93,7 +104,6 @@ const Home = () => {
                     ))}
                   </tbody>
                 </table>
-
                 <div className="flex flex-col gap-3 sm:hidden">
                   {stats.live_runs.map((r, i) => (
                     <div key={i} className="bg-[#111113] border border-white/5 rounded-lg p-3 flex flex-col gap-1">
@@ -148,6 +158,20 @@ const Home = () => {
         </main>
         <Footer />
       </div>
+
+      {showDemoModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+          <div className="bg-[#111113] border border-white/10 rounded-xl w-full max-w-md p-6 relative">
+            <button onClick={() => setShowDemoModal(false)} className="absolute top-4 right-4 text-zinc-400 hover:text-white"><X className="w-5 h-5" /></button>
+            <h2 className="text-xl font-bold text-white mb-2">Launch AI Demo</h2>
+            <p className="text-xs text-zinc-400 mb-6">This will start a simulated AI agent workflow in your environment.</p>
+            <div className="space-y-3">
+              <input type="text" placeholder="Agent Name (e.g. Security Bot)" className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-yellow-400" />
+              <button onClick={() => { setShowDemoModal(false); alert('Demo Started!'); }} className="w-full bg-yellow-400 text-black font-bold py-2 rounded-lg hover:bg-yellow-500">Start Workflow</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
