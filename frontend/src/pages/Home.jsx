@@ -3,7 +3,7 @@ import Sidebar from '../components/Common/Sidebar'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
-import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, Activity, DollarSign, Server } from 'lucide-react'
+import { Play, UserPlus, Link as LinkIcon, CheckCircle, Check, FileText, Settings, MoreHorizontal } from 'lucide-react'
 
 const Home = () => {
   const [stats, setStats] = useState(null)
@@ -39,39 +39,51 @@ const Home = () => {
               <div className="flex space-x-3">
                 <button className="bg-[#151515] border border-white/10 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-white/5"><UserPlus className="w-4 h-4 mr-2"/> New Agent</button>
                 <button className="bg-[#151515] border border-white/10 text-white px-4 py-2 rounded-lg text-sm flex items-center hover:bg-white/5"><LinkIcon className="w-4 h-4 mr-2"/> Connect Data</button>
-                <button onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))} className="bg-yellow-400 text-black font-bold px-5 py-2.5 rounded-xl hover:bg-yellow-500 flex items-center"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
+                <button onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))} className="bg-yellow-400 text-black font-bold px-5 py-2 rounded-lg hover:bg-yellow-500 flex items-center"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
               </div>
             </div>
 
             {/* Top KPI Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
-                <p className="text-zinc-400 text-sm">Success Rate</p>
-                <h3 className="text-3xl font-bold text-white mt-1">{stats.success_rate}%</h3>
-                <p className="text-xs text-green-400 mt-2">Based on {stats.resolved_incidents} resolved incidents</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-5">
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-zinc-400 text-sm">Success Rate</p>
+                  <MoreHorizontal className="w-4 h-4 text-zinc-600" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">{stats.success_rate}%</h3>
+                <p className="text-xs text-green-400 mt-2 flex items-center"><Check className="w-3 h-3 mr-1"/> Based on {stats.resolved_incidents} resolved incidents</p>
               </div>
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
-                <p className="text-zinc-400 text-sm">P95 Latency</p>
-                <h3 className="text-3xl font-bold text-white mt-1">{stats.p95_latency}ms</h3>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-zinc-400 text-sm">P95 Latency</p>
+                  <MoreHorizontal className="w-4 h-4 text-zinc-600" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">{stats.p95_latency}ms</h3>
                 <p className="text-xs text-zinc-400 mt-2">CPU Load: {stats.cpu_usage}%</p>
               </div>
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
-                <p className="text-zinc-400 text-sm">Token Usage</p>
-                <h3 className="text-3xl font-bold text-white mt-1">{stats.token_usage}</h3>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-zinc-400 text-sm">Token Usage</p>
+                  <MoreHorizontal className="w-4 h-4 text-zinc-600" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">{stats.token_usage}</h3>
                 <p className="text-xs text-zinc-400 mt-2">From {stats.total_logs.toLocaleString()} logs</p>
               </div>
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
-                <p className="text-zinc-400 text-sm">Total Cost</p>
-                <h3 className="text-3xl font-bold text-white mt-1">{stats.total_cost}</h3>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-zinc-400 text-sm">Total Cost</p>
+                  <MoreHorizontal className="w-4 h-4 text-zinc-600" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">{stats.total_cost}</h3>
                 <p className="text-xs text-zinc-400 mt-2">Estimated spend</p>
               </div>
             </div>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               
               {/* Cost Forecast */}
-              <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
+              <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <p className="text-zinc-400 text-sm">30-day Cost Forecast</p>
@@ -96,34 +108,41 @@ const Home = () => {
               </div>
 
               {/* Getting Started */}
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
                 <h3 className="text-white font-medium mb-4">Getting Started</h3>
-                <div className="space-y-3">
-                  {['Create your first workspace', 'Deploy an AI agent', 'Configure data connectors', 'Set up approval workflows', 'Review audit logs'].map((item, i) => (
-                    <div key={i} className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-400 mr-3" />
-                      <span className="text-zinc-300">{item}</span>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Create your first workspace', active: true },
+                    { label: 'Deploy an AI agent', active: true },
+                    { label: 'Configure data connectors', active: false },
+                    { label: 'Set up approval workflows', active: false },
+                    { label: 'Review audit logs', active: false }
+                  ].map((item, i) => (
+                    <div key={i} className={`flex items-center text-sm p-2 rounded-lg border ${item.active ? 'bg-green-500/5 border-green-500/20 text-zinc-200' : 'border-white/5 text-zinc-400'}`}>
+                      {item.active ? <CheckCircle className="w-4 h-4 text-green-500 mr-3 shrink-0" /> : <div className="w-4 h-4 border border-zinc-600 rounded-full mr-3 shrink-0"></div>}
+                      <span>{item.label}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Live Runs Stream */}
-              <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
+              <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-white font-medium">Live Runs Stream</h3>
-                  <span className="text-xs text-zinc-500">Real Services</span>
+                  <span className="text-xs text-zinc-500">Last 50</span>
                 </div>
                 <table className="w-full text-left text-sm">
                   <thead className="text-xs text-zinc-500 uppercase border-b border-white/10">
-                    <tr><th className="pb-3">Service</th><th className="pb-3">Latency</th><th className="pb-3">Status</th></tr>
+                    <tr><th className="pb-3">Name</th><th className="pb-3">Time</th><th className="pb-3">Latency</th><th className="pb-3">Status</th></tr>
                   </thead>
                   <tbody>
                     {stats.live_runs.map((run, i) => (
                       <tr key={i} className="border-b border-white/5 last:border-0">
                         <td className="py-3 text-white font-medium">{run.name}</td>
+                        <td className="py-3 text-zinc-400">just now</td>
                         <td className="py-3 text-zinc-400">{run.latency}</td>
-                        <td className="py-3"><span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs">{run.status}</span></td>
+                        <td className="py-3"><span className="bg-green-500/10 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Live</span></td>
                       </tr>
                     ))}
                   </tbody>
@@ -131,7 +150,7 @@ const Home = () => {
               </div>
 
               {/* Compliance Pulse */}
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
                 <h3 className="text-white font-medium mb-4">Compliance Pulse</h3>
                 <div className="flex justify-center mb-4">
                   <div className="relative">
@@ -147,9 +166,9 @@ const Home = () => {
                 </div>
                 <div className="space-y-2">
                   {['Data Privacy', 'Approval Gates', 'Security Training'].map((item, i) => (
-                    <div key={i} className="flex justify-between text-xs">
-                      <span className="text-zinc-400">{item}</span>
-                      <span className="text-green-400">Active</span>
+                    <div key={i} className="flex justify-between text-xs p-2 bg-white/5 rounded border border-white/5">
+                      <span className="text-zinc-300">{item}</span>
+                      <span className="text-green-400 font-medium">Active</span>
                     </div>
                   ))}
                 </div>
