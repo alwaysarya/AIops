@@ -29,7 +29,7 @@ const Approvals = () => {
       setMessage(res.data.message)
       fetchPending()
       setTimeout(() => setMessage(''), 5000)
-    } catch (e) { setMessage('❌ Failed to approve runbook') }
+    } catch (e) { setMessage('❌ Failed to approve') }
   }
 
   return (
@@ -38,6 +38,7 @@ const Approvals = () => {
         <TopNavbar />
         <main className="flex-1 overflow-y-auto p-8">
           <div className="max-w-[1200px] mx-auto">
+            
             <div className="mb-8">
               <h1 className="text-3xl font-semibold text-white tracking-tight">Approvals & Runbooks</h1>
               <p className="text-zinc-400 text-sm mt-1">Human-in-the-loop approval for autonomous actions.</p>
@@ -49,7 +50,7 @@ const Approvals = () => {
               {loading ? (
                 <div className="text-center py-12 text-zinc-500">Loading pending approvals...</div>
               ) : runbooks.length === 0 ? (
-                <div className="text-center py-12 text-zinc-500 glass-card rounded-2xl">No pending approvals. All systems autonomous.</div>
+                <div className="text-center py-12 text-zinc-500 bg-[#0A0A0A] rounded-2xl border border-white/10">No pending approvals. All systems autonomous.</div>
               ) : (
                 runbooks.map((rb) => (
                   <div key={rb.id} className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 flex justify-between items-center">
@@ -58,7 +59,7 @@ const Approvals = () => {
                       <div>
                         <h3 className="text-white font-semibold">Action: {rb.action}</h3>
                         <p className="text-zinc-400 text-sm">Incident ID: #{rb.incident_id} | Requested by: {rb.requested_by}</p>
-                        <p className="text-zinc-500 text-xs mt-1">Run ID: {rb.run_id} | {new Date(rb.timestamp).toLocaleString()}</p>
+                        <p className="text-zinc-500 text-xs mt-1">Run ID: {rb.run_id}</p>
                       </div>
                     </div>
                     <button onClick={() => handleApprove(rb.run_id)} className="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center">
