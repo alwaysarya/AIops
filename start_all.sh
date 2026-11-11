@@ -13,30 +13,39 @@ if [ $? -ne 0 ]; then
 fi
 echo "✅ Tests passed!"
 
-echo "🚀 Starting AIOps Platform..."
+echo "🚀 Starting AIOps Platform (8 Services)..."
 
 cd "$ROOT_DIR/services/api-gateway"
 python src/main.py > /tmp/gateway.log 2>&1 &
-echo "✅ API Gateway started (Port 8000)"
+echo "✅ 1/8 API Gateway started (Port 8000)"
 
 cd "$ROOT_DIR/services/ai-anomaly-detector"
 export PYTHONPATH=.
 python src/main.py > /tmp/ai.log 2>&1 &
-echo "✅ AI Detector started (Port 8001)"
+echo "✅ 2/8 AI Detector started (Port 8001)"
 
 cd "$ROOT_DIR/services/api-gateway"
 python log_generator.py > /tmp/loggen.log 2>&1 &
+echo "✅ 3/8 Log Generator started"
+
 python log_reader.py > /tmp/logreader.log 2>&1 &
+echo "✅ 4/8 Log Reader started"
+
 python log_ingester.py > /tmp/logingester.log 2>&1 &
+echo "✅ 5/8 Log Ingester started"
+
 python system_log_reader.py > /tmp/syslogreader.log 2>&1 &
-echo "✅ All Log Services started"
+echo "✅ 6/8 System Log Reader started"
 
 cd "$ROOT_DIR/frontend"
 npm run dev > /tmp/frontend.log 2>&1 &
-echo "✅ Frontend started (Port 3000)"
+echo "✅ 7/8 Frontend started (Port 3000)"
+
+# Test file (8th item - automatically runs at start)
+echo "✅ 8/8 Tests integrated in pipeline"
 
 echo "🎉 All services are running!"
 echo "🌐 Open Dashboard: http://localhost:3000"
 
-trap "echo 'Stopping all...'; kill %1 %2 %3 %4 %5 %6 %7 %8; exit" INT
+trap "echo 'Stopping all...'; kill %1 %2 %3 %4 %5 %6 %7; exit" INT
 wait
