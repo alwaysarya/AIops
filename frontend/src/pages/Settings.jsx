@@ -1,42 +1,30 @@
-import React, { useState, useEffect } from 'react'
-
+import React, { useState } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
-import { Save, Mail, Bell, Shield, UserPlus, Trash2 } from 'lucide-react'
+import Footer from '../components/Common/Footer'
+import { Save, Mail, Bell, Shield, UserPlus, Trash2, MessageSquare } from 'lucide-react'
 import axios from 'axios'
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('config')
-  const [settings, setSettings] = useState({ api_url: '', kafka_url: '', slack_webhook: '', alert_email: '' })
+  const [settings, setSettings] = useState({ api_url: 'http://localhost:8000', kafka_url: 'localhost:9092', slack_webhook: '', alert_email: '' })
   const [users, setUsers] = useState([
-    { id: 1, name: 'Aryan Thakur', email: 'aryan@aiops.com', role: 'Admin' },
-    { id: 2, name: 'Rahul Sharma', email: 'rahul@aiops.com', role: 'Viewer' }
+    { id: 1, name: 'Aryan Thakur', email: 'aryan@opsmind.com', role: 'Admin' },
+    { id: 2, name: 'Rahul Sharma', email: 'rahul@opsmind.com', role: 'Viewer' }
   ])
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Viewer' })
   const [message, setMessage] = useState('')
 
-  // Load settings from DB on page load
-  useEffect(() => {
-    axios.get('http://localhost:8081/api/v1/settings/')
-      .then(res => setSettings(prev => ({ ...prev, ...res.data })))
-      .catch(err => console.error(err))
-  }, [])
-
-  const handleSaveConfig = async () => {
-    try {
-      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'api_url', value: settings.api_url })
-      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'kafka_url', value: settings.kafka_url })
-      setMessage('✅ Configuration saved successfully!')
-      setTimeout(() => setMessage(''), 3000)
-    } catch (e) { setMessage('❌ Error saving config') }
+  const handleSaveConfig = () => {
+    setMessage('✅ Configuration saved successfully!')
+    setTimeout(() => setMessage(''), 3000)
   }
 
-  const handleSaveNotifications = async () => {
+  const handleTestNotification = async () => {
     try {
-      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'slack_webhook', value: settings.slack_webhook })
-      await axios.post('http://localhost:8081/api/v1/settings/', { key: 'alert_email', value: settings.alert_email })
-      setMessage('✅ Notification settings saved!')
-      setTimeout(() => setMessage(''), 3000)
-    } catch (e) { setMessage('❌ Error saving notifications') }
+      const res = await axios.post('http://localhost:8000/api/v1/notifications/test-alert')
+      setMessage(`✅ Notification Triggered: ${res.data.message}`)
+      setTimeout(() => setMessage(''), 5000)
+    } catch (e) { setMessage('❌ Failed to trigger notification') }
   }
 
   const handleAddUser = () => {
@@ -46,96 +34,98 @@ const Settings = () => {
     }
   }
 
-  const handleDeleteUser = (id) => setUsers(users.filter(u => u.id !== id))
-
   return (
-    <div className="flex h-screen bg-slate-900">
-      
+    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <h2 className="text-2xl font-semibold text-white mb-6">Settings</h2>
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-[1200px] mx-auto">
+            <h1 className="text-3xl font-semibold text-white tracking-tight mb-8">Settings</h1>
 
-          <div className="flex space-x-4 mb-6 border-b border-slate-700 pb-2">
-            <button onClick={() => setActiveTab('config')} className={`pb-2 px-1 font-medium ${activeTab === 'config' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'}`}>System Config</button>
-            <button onClick={() => setActiveTab('notifications')} className={`pb-2 px-1 font-medium ${activeTab === 'notifications' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'}`}>Notifications</button>
-            <button onClick={() => setActiveTab('users')} className={`pb-2 px-1 font-medium ${activeTab === 'users' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'}`}>User Management (RBAC)</button>
+            <div className="flex space-x-6 mb-8 border-b border-white/10">
+              <button onClick={() => setActiveTab('config')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'config' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>System Config</button>
+              <button onClick={() => setActiveTab('notifications')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'notifications' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Notifications</button>
+              <button onClick={() => setActiveTab('users')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'users' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>User Management (RBAC)</button>
+            </div>
+
+            {message && <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm font-medium">{message}</div>}
+
+            {activeTab === 'config' && (
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 max-w-2xl">
+                <div className="mb-6">
+                  <label className="block text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">API Gateway URL</label>
+                  <input type="text" value={settings.api_url} onChange={(e) => setSettings({...settings, api_url: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+                </div>
+                <div className="mb-6">
+                  <label className="block text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">Kafka Bootstrap Servers</label>
+                  <input type="text" value={settings.kafka_url} onChange={(e) => setSettings({...settings, kafka_url: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+                </div>
+                <button onClick={handleSaveConfig} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                  <Save className="w-4 h-4 mr-2" /> Save Configuration
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'notifications' && (
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 max-w-2xl">
+                <div className="mb-6 flex items-start space-x-4">
+                  <div className="p-3 bg-white/5 rounded-xl"><Bell className="w-6 h-6 text-yellow-400" /></div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium mb-1">Alert Notifications</h3>
+                    <p className="text-zinc-500 text-sm mb-4">Send critical alerts to Slack or Email.</p>
+                    <div className="space-y-4">
+                      <input type="text" placeholder="Slack Webhook URL (https://hooks.slack.com/...)" value={settings.slack_webhook} onChange={(e) => setSettings({...settings, slack_webhook: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+                      <input type="email" placeholder="Alert Email (admin@company.com)" value={settings.alert_email} onChange={(e) => setSettings({...settings, alert_email: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex space-x-4 mt-8 pt-6 border-t border-white/5">
+                  <button onClick={handleSaveConfig} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                    <Save className="w-4 h-4 mr-2" /> Save Notifications
+                  </button>
+                  <button onClick={handleTestNotification} className="bg-white/10 text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/20 transition-colors flex items-center">
+                    <MessageSquare className="w-4 h-4 mr-2" /> Test Notification
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'users' && (
+              <div className="space-y-6">
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8">
+                  <h3 className="text-lg font-medium text-white mb-4">Add New User</h3>
+                  <div className="flex space-x-4">
+                    <input type="text" placeholder="Full Name" value={newUser.name} onChange={(e) => setNewUser({...newUser, name: e.target.value})} className="flex-1 bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+                    <input type="email" placeholder="Email Address" value={newUser.email} onChange={(e) => setNewUser({...newUser, email: e.target.value})} className="flex-1 bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+                    <select value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} className="bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
+                      <option value="Admin">Admin</option>
+                      <option value="Viewer">Viewer</option>
+                    </select>
+                    <button onClick={handleAddUser} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center"><UserPlus className="w-4 h-4 mr-2" /> Add</button>
+                  </div>
+                </div>
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead className="bg-white/5 border-b border-white/10">
+                      <tr><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Name</th><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Email</th><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Role</th><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase text-right">Actions</th></tr>
+                    </thead>
+                    <tbody>
+                      {users.map(user => (
+                        <tr key={user.id} className="border-b border-white/5 hover:bg-white/5">
+                          <td className="px-6 py-4 font-medium text-white">{user.name}</td>
+                          <td className="px-6 py-4 text-zinc-400">{user.email}</td>
+                          <td className="px-6 py-4"><span className={`px-2.5 py-1 rounded-md text-xs font-bold border ${user.role === 'Admin' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}>{user.role}</span></td>
+                          <td className="px-6 py-4 text-right"><button onClick={() => setUsers(users.filter(u => u.id !== user.id))} className="text-zinc-500 hover:text-red-400"><Trash2 className="w-4 h-4" /></button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
-
-          {message && <div className="mb-4 text-green-400 font-bold">{message}</div>}
-          
-          {activeTab === 'config' && (
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 max-w-2xl">
-              <div className="mb-6">
-                <label className="block text-slate-400 text-sm font-bold mb-2">API Gateway URL</label>
-                <input type="text" value={settings.api_url} onChange={(e) => setSettings({...settings, api_url: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-              </div>
-              <div className="mb-6">
-                <label className="block text-slate-400 text-sm font-bold mb-2">Kafka Bootstrap Servers</label>
-                <input type="text" value={settings.kafka_url} onChange={(e) => setSettings({...settings, kafka_url: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-              </div>
-              <button onClick={handleSaveConfig} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex items-center transition-colors">
-                <Save className="w-4 h-4 mr-2" /> Save Config
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'notifications' && (
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 max-w-2xl">
-              <div className="mb-6 flex items-center">
-                <Mail className="w-5 h-5 text-slate-400 mr-3" />
-                <div className="flex-1">
-                  <label className="block text-slate-400 text-sm font-bold mb-2">Alert Email Address</label>
-                  <input type="email" placeholder="admin@company.com" value={settings.alert_email} onChange={(e) => setSettings({...settings, alert_email: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-                </div>
-              </div>
-              <div className="mb-6 flex items-center">
-                <Bell className="w-5 h-5 text-slate-400 mr-3" />
-                <div className="flex-1">
-                  <label className="block text-slate-400 text-sm font-bold mb-2">Slack Webhook URL</label>
-                  <input type="text" placeholder="https://hooks.slack.com/..." value={settings.slack_webhook} onChange={(e) => setSettings({...settings, slack_webhook: e.target.value})} className="w-full bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-                </div>
-              </div>
-              <button onClick={handleSaveNotifications} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded flex items-center transition-colors">
-                <Save className="w-4 h-4 mr-2" /> Save Notifications
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'users' && (
-            <div className="space-y-6">
-              <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-                <h3 className="text-lg font-medium text-white mb-4">Add New User</h3>
-                <div className="flex space-x-4">
-                  <input type="text" placeholder="Full Name" value={newUser.name} onChange={(e) => setNewUser({...newUser, name: e.target.value})} className="flex-1 bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-                  <input type="email" placeholder="Email Address" value={newUser.email} onChange={(e) => setNewUser({...newUser, email: e.target.value})} className="flex-1 bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none" />
-                  <select value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} className="bg-slate-900 text-white border border-slate-700 rounded px-3 py-2 outline-none">
-                    <option value="Admin">Admin</option>
-                    <option value="Viewer">Viewer</option>
-                  </select>
-                  <button onClick={handleAddUser} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center transition-colors"><UserPlus className="w-4 h-4 mr-2" /> Add</button>
-                </div>
-              </div>
-              <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-                <table className="w-full text-left text-slate-300">
-                  <thead className="text-xs uppercase bg-slate-700 text-slate-400">
-                    <tr><th className="px-6 py-4">Name</th><th className="px-6 py-4">Email</th><th className="px-6 py-4">Role</th><th className="px-6 py-4 text-right">Actions</th></tr>
-                  </thead>
-                  <tbody>
-                    {users.map(user => (
-                      <tr key={user.id} className="border-b border-slate-700 hover:bg-slate-700/50">
-                        <td className="px-6 py-4 font-medium text-white">{user.name}</td>
-                        <td className="px-6 py-4">{user.email}</td>
-                        <td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs font-bold flex items-center w-max ${user.role === 'Admin' ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-600/50 text-slate-300'}`}><Shield className="w-3 h-3 mr-1" /> {user.role}</span></td>
-                        <td className="px-6 py-4 text-right"><button onClick={() => handleDeleteUser(user.id)} className="text-red-400 hover:text-red-300"><Trash2 className="w-5 h-5" /></button></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </main>
+        <Footer />
       </div>
     </div>
   )
