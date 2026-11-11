@@ -2,7 +2,7 @@
 
 echo "🚀 Starting AIOps Platform..."
 
-# 1. API Gateway (Backend)
+# 1. API Gateway
 cd services/api-gateway
 export PYTHONPATH=.
 python src/main.py > /tmp/gateway.log 2>&1 &
@@ -23,7 +23,11 @@ echo "✅ Log Generator started"
 python log_reader.py > /tmp/logreader.log 2>&1 &
 echo "✅ Log Reader started"
 
-# 5. Frontend
+# 5. Log Ingester (NEW)
+python log_ingester.py > /tmp/logingester.log 2>&1 &
+echo "✅ Log Ingester started"
+
+# 6. Frontend
 cd ../../frontend
 npm run dev > /tmp/frontend.log 2>&1 &
 echo "✅ Frontend started (Port 3000)"
@@ -33,5 +37,5 @@ echo "🎉 All services are running!"
 echo "🌐 Open Dashboard: http://localhost:3000"
 echo "🛑 Press Ctrl+C to stop all services."
 
-trap "echo 'Stopping all...'; kill $GATEWAY_PID $AI_PID $LOG_PID $READER_PID $FRONTEND_PID; exit" INT
+trap "echo 'Stopping all...'; kill $GATEWAY_PID $AI_PID $LOG_PID $READER_PID $INGESTER_PID $FRONTEND_PID; exit" INT
 wait
