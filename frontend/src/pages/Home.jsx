@@ -1,61 +1,24 @@
 import React, { useState } from 'react'
-import Sidebar from '../components/Common/Sidebar'
 import Footer from '../components/Common/Footer'
 import Globe3D from '../components/Common/Globe3D'
-import { Cloud, Database, Activity, AlertTriangle, Shield, Zap, MoreVertical, Server } from 'lucide-react'
+import TopNavbar from '../components/Common/TopNavbar'
+import { Cloud, Database, Activity, AlertTriangle, Shield, Zap, MoreVertical, Server, Search } from 'lucide-react'
 
 const Home = () => {
   return (
     <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden relative">
       
-      {/* Bottom Horizon Glow */}
       <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-purple-900/40 via-purple-900/10 to-transparent pointer-events-none z-0"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-      <Sidebar />
-      
       <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         
-        <header className="h-20 flex items-center justify-between px-8 border-b border-white/5 relative z-20 bg-black/20 backdrop-blur-sm">
-          <div className="flex items-center space-x-8">
-            <div className="flex items-center gap-2 text-white font-semibold text-xl tracking-tight">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-purple-400 to-blue-400"></div>
-              </div>
-              OpsMind
-            </div>
-            
-            <div className="hidden lg:flex items-center bg-[#151515] border border-white/10 rounded-full p-1">
-              <button className="px-5 py-2 rounded-full bg-white text-black text-sm font-medium flex items-center space-x-2">
-                <Activity className="w-4 h-4" />
-                <span>Overview</span>
-              </button>
-              <div className="flex items-center px-2 space-x-1">
-                <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"><Activity className="w-4 h-4" /></button>
-                <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"><Database className="w-4 h-4" /></button>
-                <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"><Server className="w-4 h-4" /></button>
-                <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"><Shield className="w-4 h-4" /></button>
-                <button className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"><Zap className="w-4 h-4" /></button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button className="p-2.5 bg-[#151515] border border-white/10 rounded-full text-gray-400 hover:text-white transition-colors"><MoreVertical className="w-4 h-4" /></button>
-            <button className="p-2.5 bg-[#151515] border border-white/10 rounded-full text-gray-400 hover:text-white transition-colors relative">
-              <AlertTriangle className="w-4 h-4" />
-              <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-            </button>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-600 to-gray-900 border border-white/20 p-0.5">
-              <img src="https://i.pravatar.cc/150?img=11" alt="user" className="w-full h-full rounded-full object-cover" />
-            </div>
-          </div>
-        </header>
+        <TopNavbar />
         
         <main className="flex-1 overflow-y-auto px-8 pb-8 relative z-20">
-          <div className="max-w-[1500px] mx-auto">
+          <div className="max-w-[1600px] mx-auto">
             
-            <div className="mb-8">
+            <div className="mb-8 mt-2">
               <h1 className="text-3xl font-medium text-white tracking-tight">Dashboard Overview</h1>
               <p className="text-gray-500 text-sm mt-1">Real-time system health and AI-powered insights</p>
             </div>
@@ -104,7 +67,6 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* 3D Globe */}
               <div className="lg:col-span-6 relative">
                 <Globe3D />
               </div>
@@ -149,7 +111,6 @@ const Home = () => {
                     <span className="text-xs text-green-400 font-medium">{item.trend}</span>
                   </div>
                   <p className="text-[11px] text-gray-500">{item.label}</p>
-                  
                   <div className="mt-6 flex items-end justify-between h-12 opacity-80">
                     {[30,50,40,70,45,80,55,35,60,45,75,85,50,30,40].map((h, j) => (
                       <div key={j} className="w-1.5 bg-purple-500 rounded-full" style={{ height: `${h}%`, boxShadow: '0 0 8px rgba(168,85,247,0.5)' }}></div>

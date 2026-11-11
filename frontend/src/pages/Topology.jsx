@@ -1,14 +1,14 @@
 import React from 'react'
-import Sidebar from '../components/Common/Sidebar'
-import Navbar from '../components/Common/Navbar'
+
+import TopNavbar from '../components/Common/TopNavbar'
 import { Server, Database, Globe, Activity } from 'lucide-react'
 
 const Topology = () => {
   return (
     <div className="flex h-screen bg-slate-900">
-      <Sidebar />
+      
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
+        <TopNavbar />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-white">System Topology Map</h2>

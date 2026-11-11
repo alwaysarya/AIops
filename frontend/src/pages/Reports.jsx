@@ -1,6 +1,6 @@
 import React from 'react'
-import Sidebar from '../components/Common/Sidebar'
-import Navbar from '../components/Common/Navbar'
+
+import TopNavbar from '../components/Common/TopNavbar'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Download, TrendingUp, ShieldCheck, Clock } from 'lucide-react'
 
@@ -18,9 +18,9 @@ const Reports = () => {
 
   return (
     <div className="flex h-screen bg-slate-900">
-      <Sidebar />
+      
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
+        <TopNavbar />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-white">System Analytics & Reports</h2>

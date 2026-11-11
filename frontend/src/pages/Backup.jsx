@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import Sidebar from '../components/Common/Sidebar'
-import Navbar from '../components/Common/Navbar'
+
+import TopNavbar from '../components/Common/TopNavbar'
 import { Database, Download, Upload, HardDrive } from 'lucide-react'
 import axios from 'axios'
 
@@ -34,9 +34,9 @@ const Backup = () => {
 
   return (
     <div className="flex h-screen bg-slate-900">
-      <Sidebar />
+      
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
+        <TopNavbar />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-white flex items-center">
