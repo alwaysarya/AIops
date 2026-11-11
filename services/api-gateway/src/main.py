@@ -50,3 +50,5 @@ app.include_router(k8s.router, prefix="/api/v1/k8s", tags=["Kubernetes"])
 from src.routes import alerts
 
 from src.routes import ai_proxy
+
+from src.routes import websocket
