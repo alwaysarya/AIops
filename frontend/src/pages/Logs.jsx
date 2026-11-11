@@ -2,20 +2,24 @@ import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import { Search, Filter, Download } from 'lucide-react'
+import LoadingSpinner from '../components/Common/LoadingSpinner'
 
 const Logs = () => {
   const [logs, setLogs] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterLevel, setFilterLevel] = useState('ALL')
 
   useEffect(() => {
-    // Connect to WebSocket
     const ws = new WebSocket('ws://localhost:8000/api/v1/ws/ws')
 
     ws.onmessage = (event) => {
       const newLog = JSON.parse(event.data)
-      setLogs((prevLogs) => [newLog, ...prevLogs].slice(0, 100)) // Keep last 100 logs
+      setLogs((prevLogs) => [newLog, ...prevLogs].slice(0, 100))
+      setLoading(false)
     }
+
+    ws.onerror = () => setLoading(false)
 
     return () => ws.close()
   }, [])
@@ -63,7 +67,6 @@ const Logs = () => {
               </button>
             </div>
 
-            {/* Search & Filter */}
             <div className="flex space-x-4 mb-6">
               <div className="relative flex-1">
                 <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500" />
@@ -90,7 +93,6 @@ const Logs = () => {
               </div>
             </div>
             
-            {/* Logs Table */}
             <div className="bg-[#0A0A0A] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
               <div className="h-[calc(100vh-300px)] overflow-y-auto">
                 <table className="w-full text-left text-sm">
@@ -103,8 +105,10 @@ const Logs = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {filteredLogs.length === 0 ? (
-                      <tr><td colSpan="4" className="text-center py-8 text-zinc-500">Waiting for incoming logs...</td></tr>
+                    {loading ? (
+                      <tr><td colSpan="4"><LoadingSpinner text="Connecting to log stream..." /></td></tr>
+                    ) : filteredLogs.length === 0 ? (
+                      <tr><td colSpan="4" className="text-center py-8 text-zinc-500">No logs match your criteria</td></tr>
                     ) : (
                       filteredLogs.map((log, index) => (
                         <tr key={index} className="hover:bg-white/5 transition-colors">

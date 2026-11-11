@@ -18,6 +18,7 @@ import FinOps from './pages/FinOps'
 import Approvals from './pages/Approvals'
 import Copilot from './components/Common/Copilot'
 import CommandPalette from './components/Common/CommandPalette'
+import ErrorBoundary from './components/Common/ErrorBoundary'
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token')
@@ -26,7 +27,7 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <Router>
+    <ErrorBoundary><Router>
       <div className="min-h-screen bg-[#030303] text-white">
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -49,7 +50,7 @@ function App() {
         <Copilot />
         <CommandPalette />
       </div>
-    </Router>
+    </Router></ErrorBoundary>
   )
 }
 
