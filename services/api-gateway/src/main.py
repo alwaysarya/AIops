@@ -110,3 +110,6 @@ app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["Dashboar
 
 from src.routes import alerts_ws
 app.include_router(alerts_ws.router, prefix="/api/v1/alerts", tags=["Alerts WS"])
+
+from src.routes import incidents_ws
+app.include_router(incidents_ws.router, prefix="/api/v1/incidents", tags=["Incidents WS"])
