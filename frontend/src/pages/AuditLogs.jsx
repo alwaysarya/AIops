@@ -1,67 +1,90 @@
-import React, { useState } from 'react'
-
+import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
+import Footer from '../components/Common/Footer'
 import { Shield, User, Clock } from 'lucide-react'
+import axios from 'axios'
 
 const AuditLogs = () => {
-  const [logs] = useState([
-    { id: 1, user: 'Aryan', action: 'Restarted Pod (payment-service)', time: '10:45 AM', type: 'remediation' },
-    { id: 2, user: 'Rahul', action: 'Changed API Gateway URL in Settings', time: '10:30 AM', type: 'config' },
-    { id: 3, user: 'Aryan', action: 'Added new user (Viewer role)', time: '09:15 AM', type: 'rbac' },
-    { id: 4, user: 'System', action: 'Auto-Fix triggered for High CPU', time: '08:00 AM', type: 'auto' },
-    { id: 5, user: 'Aryan', action: 'Exported Logs to CSV', time: 'Yesterday', type: 'export' },
-  ])
+  const [logs, setLogs] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const getBadge = (type) => {
-    switch(type) {
-      case 'remediation': return <span className="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-bold">REMEDIATION</span>
-      case 'config': return <span className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs font-bold">CONFIG</span>
-      case 'rbac': return <span className="bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-xs font-bold">SECURITY</span>
-      case 'auto': return <span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs font-bold">AUTO-FIX</span>
-      default: return <span className="bg-slate-600 text-slate-300 px-2 py-1 rounded text-xs font-bold">SYSTEM</span>
+  const fetchLogs = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/v1/audit/')
+      setLogs(res.data.logs)
+      setLoading(false)
+    } catch (e) { 
+      console.error(e)
+      setLoading(false)
     }
   }
 
+  useEffect(() => { 
+    fetchLogs() 
+    const interval = setInterval(fetchLogs, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const getBadge = (action) => {
+    if (action.toLowerCase().includes('delete')) return 'bg-red-500/10 text-red-400 border-red-500/20'
+    if (action.toLowerCase().includes('create')) return 'bg-green-500/10 text-green-400 border-green-500/20'
+    if (action.toLowerCase().includes('login')) return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+    return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+  }
+
   return (
-    <div className="flex h-screen bg-slate-900">
-      
+    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-white flex items-center">
-              <Shield className="w-6 h-6 mr-3 text-blue-400" /> Security Audit Logs
-            </h2>
-            <span className="text-sm text-slate-400">Last updated: Just now</span>
-          </div>
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-[1200px] mx-auto">
+            
+            <div className="mb-8">
+              <h1 className="text-3xl font-semibold text-white tracking-tight flex items-center">
+                <Shield className="w-8 h-8 mr-3 text-blue-400" /> Audit Logs
+              </h1>
+              <p className="text-zinc-400 text-sm mt-1">Immutable trail of all system actions and events.</p>
+            </div>
 
-          <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-            <table className="w-full text-left text-slate-300">
-              <thead className="text-xs uppercase bg-slate-700 text-slate-400">
-                <tr>
-                  <th className="px-6 py-4">User</th>
-                  <th className="px-6 py-4">Action Performed</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-slate-700 hover:bg-slate-700/50">
-                    <td className="px-6 py-4 font-medium text-white flex items-center">
-                      <User className="w-4 h-4 mr-2 text-slate-500" /> {log.user}
-                    </td>
-                    <td className="px-6 py-4">{log.action}</td>
-                    <td className="px-6 py-4">{getBadge(log.type)}</td>
-                    <td className="px-6 py-4 text-sm text-slate-500 flex items-center">
-                      <Clock className="w-3 h-3 mr-1" /> {log.time}
-                    </td>
+            <div className="bg-[#0A0A0A] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+              <table className="w-full text-left">
+                <thead className="bg-white/5 border-b border-white/10">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">User</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Action</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Resource</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Time</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {loading ? (
+                    <tr><td colSpan="4" className="text-center py-8 text-zinc-500">Loading audit trail...</td></tr>
+                  ) : logs.length === 0 ? (
+                    <tr><td colSpan="4" className="text-center py-8 text-zinc-500">No audit logs found.</td></tr>
+                  ) : (
+                    logs.map((log) => (
+                      <tr key={log.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-6 py-4 font-medium text-white flex items-center">
+                          <User className="w-4 h-4 mr-2 text-zinc-500" /> {log.user_id || 'System'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getBadge(log.action)}`}>
+                            {log.action}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-zinc-400 font-mono text-sm">{log.resource}</td>
+                        <td className="px-6 py-4 text-sm text-zinc-500 flex items-center">
+                          <Clock className="w-3 h-3 mr-1.5" /> {new Date(log.timestamp).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </main>
+        <Footer />
       </div>
     </div>
   )

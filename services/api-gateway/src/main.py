@@ -92,3 +92,6 @@ app.include_router(predictions.router, prefix="/api/v1/predictions", tags=["Pred
 
 from src.routes import runbooks
 app.include_router(runbooks.router, prefix="/api/v1/runbooks", tags=["Runbooks"])
+
+from src.routes import audit
+app.include_router(audit.router, prefix="/api/v1/audit", tags=["Audit"])
