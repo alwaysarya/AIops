@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
-import { Cloud, Server, Activity, DollarSign } from 'lucide-react'
+import { Cloud, Server } from 'lucide-react'
 import axios from 'axios'
 
 const CloudResources = () => {
