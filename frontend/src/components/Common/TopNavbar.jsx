@@ -37,6 +37,7 @@ const TopNavbar = () => {
   const mainLinks = [
     { path: '/', label: 'Overview', icon: LayoutDashboard },
     { path: '/logs', label: 'Logs', icon: List },
+    { path: '/metrics', label: 'Metrics', icon: Activity },
     { path: '/alerts', label: 'Alerts', icon: AlertTriangle },
   ]
 

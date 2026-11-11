@@ -17,6 +17,7 @@ import Security from './pages/Security'
 import FinOps from './pages/FinOps'
 import Approvals from './pages/Approvals'
 import ApiDocs from './pages/ApiDocs'
+import Metrics from './pages/Metrics'
 import Copilot from './components/Common/Copilot'
 import CommandPalette from './components/Common/CommandPalette'
 
@@ -47,6 +48,7 @@ function App() {
           <Route path="/finops" element={<ProtectedRoute><FinOps /></ProtectedRoute>} />
           <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
+          <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
         </Routes>
         <Copilot />
         <CommandPalette />
