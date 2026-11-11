@@ -13,6 +13,7 @@ import Backup from './pages/Backup'
 import AuditLogs from './pages/AuditLogs'
 import Login from './pages/Login'
 import Organizations from './pages/Organizations'
+import Security from './pages/Security'
 import Copilot from './components/Common/Copilot'
 
 const ProtectedRoute = ({ children }) => {
@@ -38,6 +39,7 @@ function App() {
           <Route path="/backup" element={<ProtectedRoute><Backup /></ProtectedRoute>} />
           <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
           <Route path="/organizations" element={<ProtectedRoute><Organizations /></ProtectedRoute>} />
+          <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
         </Routes>
         <Copilot />
       </div>

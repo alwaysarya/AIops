@@ -69,3 +69,6 @@ app.include_router(copilot.router, prefix="/api/v1/copilot", tags=["Copilot"])
 
 from src.routes import incidents
 app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["Incidents"])
+
+from src.routes import security
+app.include_router(security.router, prefix="/api/v1/security", tags=["Security"])

@@ -38,6 +38,8 @@ const TopNavbar = () => {
     { path: '/backup', label: 'Backup', icon: HardDrive },
     { path: '/audit-logs', label: 'Audit Logs', icon: Shield },
     { path: '/organizations', label: 'Organizations', icon: Building2 },
+    { path: '/security', label: 'Security Center', icon: ShieldAlert },
+    { path: '/security', label: 'Security Center', icon: ShieldAlert },
   ]
 
   return (
