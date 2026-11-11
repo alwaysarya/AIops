@@ -20,7 +20,7 @@ async def get_profile(username: str):
     conn.close()
     if not row:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"username": row["username"], "email": "admin@aiops.com"} # Dummy email for now
+    return {"username": row["username"], "email": "admin@opsmind.com"}
 
 @router.post("/change-password/{username}")
 async def change_password(username: str, req: PasswordChange):

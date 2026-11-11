@@ -58,3 +58,5 @@ app.include_router(rca.router, prefix="/api/v1/rca", tags=["RCA"])
 
 from src.routes import topology
 app.include_router(topology.router, prefix="/api/v1/topology", tags=["Topology"])
+
+from src.routes import metrics
