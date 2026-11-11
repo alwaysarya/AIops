@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
-import { DollarSign, TrendingUp, TrendingDown, AlertCircle, Lightbulb } from 'lucide-react'
+import { DollarSign, TrendingUp, Lightbulb } from 'lucide-react'
 import axios from 'axios'
 
 const FinOps = () => {
@@ -29,7 +29,6 @@ const FinOps = () => {
               <p className="text-zinc-400 text-sm mt-1">Monitor your cloud spending and optimize costs.</p>
             </div>
 
-            {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10"><DollarSign className="w-24 h-24 text-green-400" /></div>
@@ -44,31 +43,24 @@ const FinOps = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Cost Breakdown */}
               <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
                 <h3 className="text-white font-medium mb-6">Cost by Service</h3>
                 <div className="space-y-4">
                   {data.services.map((s, i) => (
                     <div key={i} className="flex justify-between items-center p-3 hover:bg-white/5 rounded-lg transition-colors border border-transparent hover:border-white/5">
                       <div className="flex items-center space-x-3">
-                        <div className={`w-2 h-2 rounded-full ${
-                          s.status === 'critical' ? 'bg-red-500' : s.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`}></div>
+                        <div className={`w-2 h-2 rounded-full ${s.status === 'critical' ? 'bg-red-500' : s.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'}`}></div>
                         <span className="text-zinc-300 font-medium">{s.name}</span>
                       </div>
                       <div className="flex items-center space-x-6">
                         <span className="text-white font-semibold">${s.cost.toFixed(2)}</span>
-                        <span className={`text-xs font-medium w-12 text-right ${
-                          s.trend.includes('+') ? 'text-red-400' : 'text-green-400'
-                        }`}>{s.trend}</span>
+                        <span className={`text-xs font-medium w-12 text-right ${s.trend.includes('+') ? 'text-red-400' : 'text-green-400'}`}>{s.trend}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Optimization Recommendations */}
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
                 <h3 className="text-white font-medium mb-6 flex items-center"><Lightbulb className="w-4 h-4 mr-2 text-yellow-400"/> Savings Recommendations</h3>
                 <div className="space-y-4">
@@ -80,7 +72,6 @@ const FinOps = () => {
                   ))}
                 </div>
               </div>
-
             </div>
           </div>
         </main>
