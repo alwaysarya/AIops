@@ -98,3 +98,9 @@ app.include_router(audit.router, prefix="/api/v1/audit", tags=["Audit"])
 
 from src.routes import cloud
 app.include_router(cloud.router, prefix="/api/v1/cloud", tags=["Cloud"])
+
+from src.routes import integrations
+app.include_router(integrations.router, prefix="/api/v1/integrations", tags=["Integrations"])
+
+from src.routes import compliance
+app.include_router(compliance.router, prefix="/api/v1/compliance", tags=["Compliance"])

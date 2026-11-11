@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut, Building2, DollarSign, CheckCircle, Book } from 'lucide-react'
+import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut, Building2, DollarSign, CheckCircle, Book, Cloud, ShieldCheck } from 'lucide-react'
 import Logo from './Logo'
 
 const TopNavbar = () => {
@@ -49,6 +49,8 @@ const TopNavbar = () => {
     { path: '/organizations', label: 'Organizations', icon: Building2 },
     { path: '/security', label: 'Security', icon: ShieldAlert },
     { path: '/finops', label: 'FinOps', icon: DollarSign },
+    { path: '/cloud', label: 'Cloud', icon: Cloud },
+    { path: '/compliance', label: 'Compliance', icon: ShieldCheck },
     { path: '/approvals', label: 'Approvals', icon: CheckCircle },
     { path: '/api-docs', label: 'API Docs', icon: Book },
   ]
@@ -72,7 +74,7 @@ const TopNavbar = () => {
               <span>More</span><ChevronDown className={`w-4 h-4 transition-transform ${showMoreMenu ? 'rotate-180' : ''}`} />
             </button>
             {showMoreMenu && (
-              <div className="absolute top-12 left-0 w-56 bg-[#121214] border border-white/10 rounded-xl shadow-2xl p-2 z-50 animate-fadeIn">
+              <div className="absolute top-12 left-0 w-56 bg-[#121214] border border-white/10 rounded-xl shadow-2xl p-2 z-50 animate-fadeIn max-h-[500px] overflow-y-auto">
                 {dropdownLinks.map((item) => (
                   <Link key={item.path} to={item.path} onClick={() => setShowMoreMenu(false)} className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${location.pathname === item.path ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
                     <item.icon className="w-4 h-4" /><span>{item.label}</span>

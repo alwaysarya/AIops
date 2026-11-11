@@ -19,6 +19,7 @@ import Approvals from './pages/Approvals'
 import ApiDocs from './pages/ApiDocs'
 import Metrics from './pages/Metrics'
 import CloudResources from './pages/Cloud'
+import Compliance from './pages/Compliance'
 import Copilot from './components/Common/Copilot'
 import CommandPalette from './components/Common/CommandPalette'
 
@@ -51,6 +52,7 @@ function App() {
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
           <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
           <Route path="/cloud" element={<ProtectedRoute><CloudResources /></ProtectedRoute>} />
+          <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
         </Routes>
         <Copilot />
         <CommandPalette />
