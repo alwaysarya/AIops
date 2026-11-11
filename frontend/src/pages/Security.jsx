@@ -13,22 +13,16 @@ const Security = () => {
     try {
       const res = await axios.get('http://localhost:8000/api/v1/security/scan')
       setFindings(res.data.findings)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
-    }
+    } catch (e) { console.error(e) } finally { setLoading(false) }
   }
 
   useEffect(() => { runScan() }, [])
 
   const getIcon = (severity) => {
-    switch(severity) {
-      case 'CRITICAL': return <ShieldAlert className="w-6 h-6 text-red-500" />
-      case 'HIGH': return <ShieldAlert className="w-6 h-6 text-orange-500" />
-      case 'MEDIUM': return <AlertTriangle className="w-6 h-6 text-yellow-500" />
-      default: return <ShieldCheck className="w-6 h-6 text-green-500" />
-    }
+    if (severity === 'CRITICAL') return <ShieldAlert className="w-6 h-6 text-red-500" />
+    if (severity === 'HIGH') return <ShieldAlert className="w-6 h-6 text-orange-500" />
+    if (severity === 'MEDIUM') return <AlertTriangle className="w-6 h-6 text-yellow-500" />
+    return <ShieldCheck className="w-6 h-6 text-green-500" />
   }
 
   return (
@@ -60,9 +54,7 @@ const Security = () => {
                         f.severity === 'HIGH' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
                         f.severity === 'MEDIUM' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' : 
                         'bg-green-500/10 text-green-400 border border-green-500/20'
-                      }`}>
-                        {f.severity}
-                      </span>
+                      }`}>{f.severity}</span>
                     </div>
                     <p className="text-zinc-400 text-sm mt-2">{f.description}</p>
                     <div className="mt-4 bg-white/5 p-3 rounded-lg border border-white/5">
