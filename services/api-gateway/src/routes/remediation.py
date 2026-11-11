@@ -3,8 +3,6 @@ from pydantic import BaseModel
 from kubernetes import client, config
 from datetime import datetime
 import logging
-import subprocess
-import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -13,34 +11,21 @@ class RemediationRequest(BaseModel):
     action: str
     service: str
 
-def get_live_kubeconfig():
-    # Force use the local kubeconfig which kubectl uses
-    kubeconfig_path = os.path.expanduser("~/.kube/config")
-    if not os.path.exists(kubeconfig_path):
+def get_k8s_client():
+    try:
+        config.load_kube_config()
+        return client.CoreV1Api()
+    except Exception as e:
+        logger.error(f"K8s config error: {e}")
         return None
-    config.load_kube_config(config_file=kubeconfig_path)
-    return client.CoreV1Api(), client.AppsV1Api()
 
 @router.post("/trigger")
 async def trigger_remediation(req: RemediationRequest):
     logger.info(f"🚨 REMEDIATION: {req.action} on {req.service}")
     
-    try:
-        core_v1, apps_v1 = get_live_kubeconfig()
-    except Exception as e:
-        # Fallback: Use subprocess to call kubectl directly
-        logger.warning(f"K8s client failed, using kubectl CLI: {e}")
-        if req.action == "restart_pod":
-            result = subprocess.run(
-                ["kubectl", "delete", "pod", "test-pod", "--ignore-not-found"],
-                capture_output=True, text=True
-            )
-            return {
-                "status": "success" if "deleted" in result.stdout else "simulated",
-                "message": result.stdout.strip() or "Pod not found",
-                "action": req.action
-            }
-        return {"status": "error", "message": str(e)}
+    core_v1 = get_k8s_client()
+    if not core_v1:
+        return {"status": "simulated", "message": "K8s not connected, simulated fix."}
 
     try:
         if req.action == "restart_pod":
@@ -61,16 +46,10 @@ async def trigger_remediation(req: RemediationRequest):
             else:
                 return {
                     "status": "simulated",
-                    "message": f"No pod named 'test-pod' found. Simulated {req.action}",
+                    "message": f"No pod named 'test-pod' found. Simulated {req.action} on {req.service}",
                     "action": req.action
                 }
-        return {"status": "success", "message": f"Executed {req.action} on {req.service}"}
+        return {"status": "success", "message": f"Executed {req.action}"}
     except Exception as e:
-        # Fallback to kubectl if API fails
-        logger.warning(f"API failed, falling back to CLI: {e}")
-        result = subprocess.run(["kubectl", "delete", "pod", "test-pod", "--ignore-not-found"], capture_output=True, text=True)
-        return {
-            "status": "success" if "deleted" in result.stdout else "simulated",
-            "message": result.stdout.strip() or "Pod not found",
-            "action": req.action
-        }
+        logger.error(f"Remediation failed: {e}")
+        return {"status": "error", "message": str(e)}
