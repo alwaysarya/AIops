@@ -72,3 +72,6 @@ app.include_router(incidents.router, prefix="/api/v1/incidents", tags=["Incident
 
 from src.routes import security
 app.include_router(security.router, prefix="/api/v1/security", tags=["Security"])
+
+from src.routes import finops
+app.include_router(finops.router, prefix="/api/v1/finops", tags=["FinOps"])

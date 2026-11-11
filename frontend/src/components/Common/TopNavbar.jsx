@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut, Building2 } from 'lucide-react'
+import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut, Building2, DollarSign } from 'lucide-react'
 import Logo from './Logo'
 
 const TopNavbar = () => {
@@ -39,7 +39,9 @@ const TopNavbar = () => {
     { path: '/audit-logs', label: 'Audit Logs', icon: Shield },
     { path: '/organizations', label: 'Organizations', icon: Building2 },
     { path: '/security', label: 'Security Center', icon: ShieldAlert },
+    { path: '/finops', label: 'Cloud Costs', icon: DollarSign },
     { path: '/security', label: 'Security Center', icon: ShieldAlert },
+    { path: '/finops', label: 'Cloud Costs', icon: DollarSign },
   ]
 
   return (

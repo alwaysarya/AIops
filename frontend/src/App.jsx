@@ -14,6 +14,7 @@ import AuditLogs from './pages/AuditLogs'
 import Login from './pages/Login'
 import Organizations from './pages/Organizations'
 import Security from './pages/Security'
+import FinOps from './pages/FinOps'
 import Copilot from './components/Common/Copilot'
 
 const ProtectedRoute = ({ children }) => {
@@ -40,6 +41,7 @@ function App() {
           <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
           <Route path="/organizations" element={<ProtectedRoute><Organizations /></ProtectedRoute>} />
           <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
+          <Route path="/finops" element={<ProtectedRoute><FinOps /></ProtectedRoute>} />
         </Routes>
         <Copilot />
       </div>
