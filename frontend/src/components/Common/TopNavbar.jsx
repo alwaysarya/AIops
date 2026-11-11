@@ -34,7 +34,7 @@ const TopNavbar = () => {
     { path: '/topology', label: 'Topology', icon: Map },
     { path: '/rca', label: 'Root Cause (AI)', icon: Zap },
     { path: '/incidents', label: 'Incidents', icon: ShieldAlert },
-    { path: '/reports', label: 'Analytics', icon: BarChart2 },
+    { path: '/reports', label: 'Analytics & Reports', icon: BarChart2 },
     { path: '/backup', label: 'Backup', icon: HardDrive },
     { path: '/audit-logs', label: 'Audit Logs', icon: Shield },
     { path: '/organizations', label: 'Organizations', icon: Building2 },

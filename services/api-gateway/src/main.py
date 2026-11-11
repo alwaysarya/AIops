@@ -60,3 +60,6 @@ from src.routes import topology
 app.include_router(topology.router, prefix="/api/v1/topology", tags=["Topology"])
 
 from src.routes import metrics
+
+from src.routes import analytics
+app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
