@@ -50,6 +50,7 @@ function App() {
           <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
           <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
           <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
+          <Route path="/cloud" element={<ProtectedRoute><CloudResources /></ProtectedRoute>} />
         </Routes>
         <Copilot />
         <CommandPalette />
