@@ -104,3 +104,6 @@ app.include_router(integrations.router, prefix="/api/v1/integrations", tags=["In
 
 from src.routes import compliance
 app.include_router(compliance.router, prefix="/api/v1/compliance", tags=["Compliance"])
+
+from src.routes import dashboard
+app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["Dashboard"])

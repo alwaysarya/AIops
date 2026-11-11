@@ -3,16 +3,23 @@ import Sidebar from '../components/Common/Sidebar'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
-import { Activity, AlertTriangle, DollarSign, Server, CheckCircle, ArrowUpRight, Play, UserPlus, Link as LinkIcon, FileText, Settings } from 'lucide-react'
+import { Play, UserPlus, Link as LinkIcon, CheckCircle } from 'lucide-react'
 
 const Home = () => {
-  const [metrics, setMetrics] = useState({ cpu: { usage_percent: 0 }, memory: { usage_percent: 0 } })
-  const [incidents, setIncidents] = useState([])
+  const [stats, setStats] = useState(null)
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/v1/metrics/system').then(res => setMetrics(res.data)).catch(() => {})
-    axios.get('http://localhost:8000/api/v1/incidents/').then(res => setIncidents(res.data.incidents)).catch(() => {})
+    const fetchStats = () => {
+      axios.get('http://localhost:8000/api/v1/dashboard/stats')
+        .then(res => setStats(res.data))
+        .catch(err => console.error(err))
+    }
+    fetchStats()
+    const interval = setInterval(fetchStats, 5000)
+    return () => clearInterval(interval)
   }, [])
+
+  if (!stats) return <div className="flex h-screen bg-[#030303] text-white items-center justify-center">Loading Real Data...</div>
 
   return (
     <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
@@ -23,7 +30,6 @@ const Home = () => {
         <main className="flex-1 overflow-y-auto p-8">
           <div className="max-w-[1400px] mx-auto">
             
-            {/* Header + Quick Actions */}
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h1 className="text-3xl font-semibold text-white">Welcome Back, Aryan</h1>
@@ -36,40 +42,39 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Top KPI Grid (4 Cards) */}
+            {/* Real KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <p className="text-zinc-400 text-sm">Success Rate</p>
-                <h3 className="text-3xl font-bold text-white mt-1">97.3%</h3>
-                <p className="text-xs text-green-400 mt-2">↑ 2.4% <span className="text-zinc-500">from last month</span></p>
+                <h3 className="text-3xl font-bold text-white mt-1">{stats.success_rate}%</h3>
+                <p className="text-xs text-green-400 mt-2">Based on {stats.resolved_incidents} resolved incidents</p>
               </div>
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <p className="text-zinc-400 text-sm">P95 Latency</p>
-                <h3 className="text-3xl font-bold text-white mt-1">234ms</h3>
-                <p className="text-xs text-red-400 mt-2">↓ 12% <span className="text-zinc-500">from last month</span></p>
+                <h3 className="text-3xl font-bold text-white mt-1">{stats.p95_latency}ms</h3>
+                <p className="text-xs text-zinc-400 mt-2">CPU Load: {stats.cpu_usage}%</p>
               </div>
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <p className="text-zinc-400 text-sm">Token Usage</p>
-                <h3 className="text-3xl font-bold text-white mt-1">2.4M</h3>
-                <p className="text-xs text-green-400 mt-2">↑ 18% <span className="text-zinc-500">from last 24hrs</span></p>
+                <h3 className="text-3xl font-bold text-white mt-1">{stats.token_usage}</h3>
+                <p className="text-xs text-zinc-400 mt-2">From {stats.total_logs.toLocaleString()} logs</p>
               </div>
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <p className="text-zinc-400 text-sm">Total Cost</p>
-                <h3 className="text-3xl font-bold text-white mt-1">$127</h3>
-                <p className="text-xs text-green-400 mt-2">↑ 15% <span className="text-zinc-500">from last 24hrs</span></p>
+                <h3 className="text-3xl font-bold text-white mt-1">{stats.total_cost}</h3>
+                <p className="text-xs text-zinc-400 mt-2">Estimated spend</p>
               </div>
             </div>
 
-            {/* Main Grid (3 Columns) */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* Left: Cost Forecast (2 columns wide) */}
+              {/* Cost Forecast */}
               <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <p className="text-zinc-400 text-sm">30-day Cost Forecast</p>
-                    <h3 className="text-4xl font-bold text-white mt-1">$3,890</h3>
-                    <p className="text-xs text-green-400 mt-1">↑ 12% Projected spend for next 30 days</p>
+                    <h3 className="text-4xl font-bold text-white mt-1">{stats.cost_forecast}</h3>
+                    <p className="text-xs text-green-400 mt-1">Projected spend for next 30 days</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-zinc-400">Confidence</p>
@@ -88,7 +93,7 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Right: Getting Started */}
+              {/* Getting Started */}
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-6">
                 <h3 className="text-white font-medium mb-4">Getting Started</h3>
                 <div className="space-y-3">
@@ -101,7 +106,7 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Bottom Left: Live Runs Stream (2 columns wide) */}
+              {/* Live Runs Stream (Real Data) */}
               <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-white font-medium">Live Runs Stream</h3>
@@ -109,21 +114,21 @@ const Home = () => {
                 </div>
                 <table className="w-full text-left text-sm">
                   <thead className="text-xs text-zinc-500 uppercase border-b border-white/10">
-                    <tr><th className="pb-3">Name</th><th className="pb-3">Latency</th><th className="pb-3">Status</th></tr>
+                    <tr><th className="pb-3">Service</th><th className="pb-3">Latency</th><th className="pb-3">Status</th></tr>
                   </thead>
                   <tbody>
-                    {['Claims-Checker', 'KYC-Validator', 'Fraud-Monitor', 'Swift-Analyzer'].map((name, i) => (
+                    {stats.live_runs.map((run, i) => (
                       <tr key={i} className="border-b border-white/5 last:border-0">
-                        <td className="py-3 text-white font-medium">{name}</td>
-                        <td className="py-3 text-zinc-400">{(Math.random() * 2).toFixed(1)}s</td>
-                        <td className="py-3"><span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs">Live</span></td>
+                        <td className="py-3 text-white font-medium">{run.name}</td>
+                        <td className="py-3 text-zinc-400">{run.latency}</td>
+                        <td className="py-3"><span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs">{run.status}</span></td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Bottom Right: Compliance Pulse */}
+              {/* Compliance Pulse */}
               <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-5">
                 <h3 className="text-white font-medium mb-4">Compliance Pulse</h3>
                 <div className="flex justify-center mb-4">
