@@ -63,3 +63,6 @@ from src.routes import metrics
 
 from src.routes import analytics
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
+
+from src.routes import copilot
+app.include_router(copilot.router, prefix="/api/v1/copilot", tags=["Copilot"])

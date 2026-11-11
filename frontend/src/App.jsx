@@ -13,6 +13,7 @@ import Backup from './pages/Backup'
 import AuditLogs from './pages/AuditLogs'
 import Login from './pages/Login'
 import Organizations from './pages/Organizations'
+import Copilot from './components/Common/Copilot'
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token')
@@ -38,6 +39,7 @@ function App() {
           <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
           <Route path="/organizations" element={<ProtectedRoute><Organizations /></ProtectedRoute>} />
         </Routes>
+        <Copilot />
       </div>
     </Router>
   )
