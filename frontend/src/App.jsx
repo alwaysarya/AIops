@@ -11,6 +11,7 @@ import Incidents from './pages/Incidents'
 import Reports from './pages/Reports'
 import Backup from './pages/Backup'
 import AuditLogs from './pages/AuditLogs'
+import Organizations from './pages/Organizations'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/backup" element={<Backup />} />
           <Route path="/audit-logs" element={<AuditLogs />} />
+          <Route path="/organizations" element={<Organizations />} />
         </Routes>
       </div>
     </Router>

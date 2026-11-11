@@ -2,53 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-base: #000000;
-  --bg-surface: rgba(28, 28, 30, 0.6);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --text-primary: #F5F5F7;
-  --text-secondary: #86868B;
-  --accent-blue: #0071E3;
-}
-
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg-base);
-  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  background-color: #050505;
+  color: #EDEDED;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
-/* Apple Glassmorphism */
-.apple-glass {
-  background: var(--bg-surface);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid var(--border-subtle);
+/* Glassmorphism Cards */
+.glass-card {
+  background: rgba(20, 20, 22, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
-.apple-card {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-.apple-card:hover {
-  transform: translateY(-2px);
+.glass-card:hover {
   border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+  background: rgba(25, 25, 28, 0.8);
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* Smooth Fade Up */
-@keyframes appleFadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-apple-fade {
-  animation: appleFadeIn 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-}
+/* Animations */
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes drawLine { from { stroke-dashoffset: 2000; } to { stroke-dashoffset: 0; } }
+@keyframes pulseGlow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+.animate-draw-line { stroke-dasharray: 2000; animation: drawLine 2s ease-out forwards; }

@@ -40,3 +40,6 @@ app.include_router(profile.router, prefix="/api/v1/profile", tags=["Profile"])
 
 from src.routes import backup
 app.include_router(backup.router, prefix="/api/v1/backup", tags=["Backup"])
+
+from src.routes import organizations
+app.include_router(organizations.router, prefix="/api/v1/orgs", tags=["Organizations"])
