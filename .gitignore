@@ -13,3 +13,6 @@ node_modules/
 services/api-gateway/.env
 .env
 services/api-gateway/.env
+*.png
+*.jpg
+*.jpeg
