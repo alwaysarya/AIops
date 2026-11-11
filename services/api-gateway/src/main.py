@@ -95,3 +95,6 @@ app.include_router(runbooks.router, prefix="/api/v1/runbooks", tags=["Runbooks"]
 
 from src.routes import audit
 app.include_router(audit.router, prefix="/api/v1/audit", tags=["Audit"])
+
+from src.routes import cloud
+app.include_router(cloud.router, prefix="/api/v1/cloud", tags=["Cloud"])

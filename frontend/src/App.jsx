@@ -18,6 +18,7 @@ import FinOps from './pages/FinOps'
 import Approvals from './pages/Approvals'
 import ApiDocs from './pages/ApiDocs'
 import Metrics from './pages/Metrics'
+import CloudResources from './pages/Cloud'
 import Copilot from './components/Common/Copilot'
 import CommandPalette from './components/Common/CommandPalette'
 
