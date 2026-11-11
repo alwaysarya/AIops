@@ -1,67 +1,22 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import Sidebar from '../components/Common/Sidebar'
 import Footer from '../components/Common/Footer'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Points, PointMaterial } from '@react-three/drei'
-import * as THREE from 'three'
+import Globe3D from '../components/Common/Globe3D'
 import { Cloud, Database, Activity, AlertTriangle, Shield, Zap, MoreVertical, Server } from 'lucide-react'
-
-// Generate particle earth data (continents ka shape)
-function generateEarthParticles(count) {
-  const positions = new Float32Array(count * 3)
-  let i = 0
-  while (i < count) {
-    // Random points on sphere surface
-    const u = Math.random()
-    const v = Math.random()
-    const theta = 2 * Math.PI * u
-    const phi = Math.acos(2 * v - 1)
-    
-    const x = Math.sin(phi) * Math.cos(theta)
-    const y = Math.sin(phi) * Math.sin(theta)
-    const z = Math.cos(phi)
-    
-    // Filter to simulate continents (dummy logic for now)
-    // In real scenario, use a texture map to filter land vs water
-    if (Math.random() > 0.3) {
-      positions[i * 3] = x * 1.5
-      positions[i * 3 + 1] = y * 1.5
-      positions[i * 3 + 2] = z * 1.5
-      i++
-    }
-  }
-  return positions
-}
-
-function EarthParticles() {
-  const ref = useRef()
-  const [positions] = useState(() => generateEarthParticles(8000))
-
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.y = state.clock.getElapsedTime() * 0.05
-    }
-  })
-
-  return (
-    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-      <PointMaterial transparent color="#c084fc" size={0.02} sizeAttenuation={true} depthWrite={false} />
-    </Points>
-  )
-}
 
 const Home = () => {
   return (
     <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden relative">
       
       {/* Bottom Horizon Glow */}
-      <div className="absolute bottom-0 left-0 w-full h-[300px] bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none z-0"></div>
+      <div className="absolute bottom-0 left-0 w-full h-[400px] bg-gradient-to-t from-purple-900/40 via-purple-900/10 to-transparent pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         
-        <header className="h-20 flex items-center justify-between px-8 border-b border-white/5 relative z-20">
+        <header className="h-20 flex items-center justify-between px-8 border-b border-white/5 relative z-20 bg-black/20 backdrop-blur-sm">
           <div className="flex items-center space-x-8">
             <div className="flex items-center gap-2 text-white font-semibold text-xl tracking-tight">
               <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
@@ -149,14 +104,9 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Center Column: Real 3D Globe */}
-              <div className="lg:col-span-6 relative min-h-[350px] flex items-center justify-center">
-                <div className="absolute inset-0">
-                  <Canvas camera={{ position: [0, 0, 3] }}>
-                    <ambientLight intensity={0.5} />
-                    <EarthParticles />
-                  </Canvas>
-                </div>
+              {/* 3D Globe */}
+              <div className="lg:col-span-6 relative">
+                <Globe3D />
               </div>
 
               <div className="lg:col-span-3">
