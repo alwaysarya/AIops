@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut, Building2, DollarSign, Bell } from 'lucide-react'
+import { Activity, Database, Server, Shield, Zap, AlertTriangle, MoreVertical, Search, LayoutDashboard, List, Map, ShieldAlert, BarChart2, HardDrive, User, Settings, ChevronDown, LogOut, Building2, DollarSign, CheckCircle, Book } from 'lucide-react'
 import Logo from './Logo'
 
 const TopNavbar = () => {
@@ -24,7 +24,6 @@ const TopNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Connect to Notification WebSocket
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8000/api/v1/notifications/ws')
     ws.onmessage = (event) => {
@@ -37,7 +36,6 @@ const TopNavbar = () => {
   const mainLinks = [
     { path: '/', label: 'Overview', icon: LayoutDashboard },
     { path: '/logs', label: 'Logs', icon: List },
-    { path: '/metrics', label: 'Metrics', icon: Activity },
     { path: '/alerts', label: 'Alerts', icon: AlertTriangle },
   ]
 
@@ -51,17 +49,17 @@ const TopNavbar = () => {
     { path: '/organizations', label: 'Organizations', icon: Building2 },
     { path: '/security', label: 'Security', icon: ShieldAlert },
     { path: '/finops', label: 'FinOps', icon: DollarSign },
+    { path: '/approvals', label: 'Approvals', icon: CheckCircle },
+    { path: '/api-docs', label: 'API Docs', icon: Book },
   ]
 
   return (
     <header className="h-20 flex items-center justify-between px-8 relative z-50 bg-[#030303] border-b border-white/5">
-      
       <div className="flex items-center space-x-10">
         <Link to="/" className="flex items-center gap-3 text-white font-semibold text-xl tracking-tight">
           <Logo className="w-10 h-10" />
           OpsMind
         </Link>
-        
         <nav className="hidden lg:flex items-center space-x-2">
           {mainLinks.map((item) => (
             <Link key={item.path} to={item.path} className={`px-4 py-2 rounded-full text-sm font-medium flex items-center space-x-2 transition-all ${location.pathname === item.path ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
@@ -85,17 +83,13 @@ const TopNavbar = () => {
           </div>
         </nav>
       </div>
-
       <div className="flex items-center space-x-4">
         <button className="p-2.5 bg-[#151515] border border-white/10 rounded-full text-gray-400 hover:text-white"><Search className="w-4 h-4" /></button>
-        
-        {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
           <button onClick={() => setShowNotifPanel(!showNotifPanel)} className="p-2.5 bg-[#151515] border border-white/10 rounded-full text-gray-400 hover:text-white relative">
-            <Bell className="w-4 h-4" />
+            <AlertTriangle className="w-4 h-4" />
             {notifications.length > 0 && <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-[#030303]"></span>}
           </button>
-          
           {showNotifPanel && (
             <div className="absolute top-12 right-0 w-80 bg-[#121214] border border-white/10 rounded-xl shadow-2xl p-4 z-50">
               <h4 className="text-white font-medium mb-3">Live Alerts</h4>
@@ -112,7 +106,6 @@ const TopNavbar = () => {
             </div>
           )}
         </div>
-
         <div className="relative" ref={profileMenuRef}>
           <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="w-10 h-10 rounded-full bg-[#151515] border border-white/10 p-0.5 cursor-pointer hover:border-white/30">
             <img src="https://i.pravatar.cc/150?img=11" alt="user" className="w-full h-full rounded-full object-cover" />

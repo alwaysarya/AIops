@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
-import { CheckCircle, Clock, ShieldAlert } from 'lucide-react'
+import { CheckCircle, Clock, XCircle } from 'lucide-react'
 import axios from 'axios'
 
 const Approvals = () => {
   const [runbooks, setRunbooks] = useState([])
   const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(true)
 
   const fetchPending = async () => {
     try {
       const res = await axios.get('http://localhost:8000/api/v1/runbooks/pending')
       setRunbooks(res.data.runbooks)
-    } catch (e) { console.error(e) }
+      setLoading(false)
+    } catch (e) { console.error(e); setLoading(false) }
   }
 
-  useEffect(() => { fetchPending() }, [])
+  useEffect(() => { 
+    fetchPending()
+    const interval = setInterval(fetchPending, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleApprove = async (run_id) => {
     try {
-      await axios.post(`http://localhost:8000/api/v1/runbooks/approve/${run_id}`)
-      setMessage(`✅ Runbook ${run_id} approved and executing!`)
+      const res = await axios.post(`http://localhost:8000/api/v1/runbooks/approve/${run_id}`)
+      setMessage(res.data.message)
       fetchPending()
-      setTimeout(() => setMessage(''), 3000)
-    } catch (e) { console.error(e) }
+      setTimeout(() => setMessage(''), 5000)
+    } catch (e) { setMessage('❌ Failed to approve runbook') }
   }
 
   return (
@@ -40,7 +46,9 @@ const Approvals = () => {
             {message && <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm font-medium">{message}</div>}
 
             <div className="space-y-4">
-              {runbooks.length === 0 ? (
+              {loading ? (
+                <div className="text-center py-12 text-zinc-500">Loading pending approvals...</div>
+              ) : runbooks.length === 0 ? (
                 <div className="text-center py-12 text-zinc-500 glass-card rounded-2xl">No pending approvals. All systems autonomous.</div>
               ) : (
                 runbooks.map((rb) => (
