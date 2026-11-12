@@ -1,0 +1,1 @@
+import React from 'react'; import PageLayout from '../components/layout/PageLayout'; export default function ApiDocs() { return <PageLayout title='API Docs'><div className='text-white p-6 bg-[#0A0A0A] rounded-xl'>API Documentation</div></PageLayout> }

@@ -1,0 +1,1 @@
+import React from 'react'; import PageLayout from '../components/layout/PageLayout'; export default function Security() { return <PageLayout title='Security'><div className='text-white p-6 bg-[#0A0A0A] rounded-xl'>Security Policies</div></PageLayout> }

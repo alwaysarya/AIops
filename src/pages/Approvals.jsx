@@ -1,0 +1,1 @@
+import React from 'react'; import PageLayout from '../components/layout/PageLayout'; export default function Approvals() { return <PageLayout title='Approvals'><div className='text-white p-6 bg-[#0A0A0A] rounded-xl'>Pending Approvals</div></PageLayout> }

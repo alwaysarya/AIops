@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CheckCircle, Shield, Link as LinkIcon, Activity, FileText, Settings, HelpCircle, LogOut, Zap, Search, X, Globe } from 'lucide-react'
+import { LayoutDashboard, CheckCircle, Shield, Link as LinkIcon, Activity, FileText, Settings, HelpCircle, LogOut, Zap, Search, X, Globe, Bot, Terminal } from 'lucide-react'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
@@ -27,46 +27,37 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <button className="lg:hidden text-zinc-400 hover:text-white" onClick={() => setIsOpen(false)}><X className="w-5 h-5" /></button>
         </div>
 
-        {/* User Profile (Moved from TopNavbar) */}
-        <div className="px-4 mt-6 flex items-center space-x-3 shrink-0">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-black font-bold text-lg border-2 border-black">A</div>
-          <div>
-            <div className="text-white font-medium text-sm">Aryan Thakur</div>
-            <div className="text-[10px] text-zinc-400 bg-white/10 px-2 py-0.5 rounded border border-white/10 inline-block mt-0.5">Admin</div>
-          </div>
-        </div>
-
         {/* Search */}
-        <div className="relative px-4 mt-4 shrink-0">
+        <div className="relative px-4 mt-6 shrink-0">
           <Search className="w-4 h-4 absolute left-7 top-1/2 transform -translate-y-1/2 text-zinc-500" />
           <input type="text" placeholder="Search..." className="w-full bg-[#111113] text-zinc-300 text-xs rounded-lg pl-9 pr-4 py-2 border border-white/5 focus:outline-none" />
         </div>
 
         {/* Scrollable Links */}
         <div className="flex-1 overflow-y-auto px-3 py-2">
+          
           <SectionTitle title="General" />
           <Link to="/" className={getLinkClass('/')}><span className="flex items-center"><LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard</span></Link>
           
-          <SectionTitle title="Workflow" />
-          <Link to="/approvals" className={getLinkClass('/approvals')}><span className="flex items-center"><CheckCircle className="w-4 h-4 mr-2" /> Approvals</span></Link>
-          <Link to="/security" className={getLinkClass('/security')}><span className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Policies</span></Link>
+          <SectionTitle title="AI Intelligence" />
+          <Link to="/ai-copilot" className={getLinkClass('/ai-copilot')}><span className="flex items-center"><Bot className="w-4 h-4 mr-2" /> AI Copilot</span></Link>
           
-          <SectionTitle title="Report" />
-          <Link to="/ai-copilot" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> AI Copilot</span></Link>
-          <Link to="/runbooks" className={getLinkClass('/metrics')}><span className="flex items-center"><Activity className="w-4 h-4 mr-2" /> Runbooks</span></Link>
-          <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><span className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Audit</span></Link>
+          <SectionTitle title="Workflow" />
+          <Link to="/incidents" className={getLinkClass('/incidents')}><span className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Incidents</span></Link>
+          <Link to="/approvals" className={getLinkClass('/approvals')}><span className="flex items-center"><CheckCircle className="w-4 h-4 mr-2" /> Approvals</span></Link>
+          <Link to="/runbooks" className={getLinkClass('/runbooks')}><span className="flex items-center"><Terminal className="w-4 h-4 mr-2" /> Runbooks</span></Link>
 
-          <SectionTitle title="Others" />
+          <SectionTitle title="Observability" />
+          <Link to="/cloud" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> Connectors</span></Link>
+          <Link to="/metrics" className={getLinkClass('/metrics')}><span className="flex items-center"><Activity className="w-4 h-4 mr-2" /> Metrics</span></Link>
+          <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><span className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Audit Logs</span></Link>
+
+          <SectionTitle title="Security & Admin" />
+          <Link to="/security" className={getLinkClass('/security')}><span className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Policies</span></Link>
           <Link to="/settings" className={getLinkClass('/settings')}><span className="flex items-center"><Settings className="w-4 h-4 mr-2" /> Settings</span></Link>
           <Link to="/help" className={getLinkClass('/help')}><span className="flex items-center"><HelpCircle className="w-4 h-4 mr-2" /> Help</span></Link>
           
-          {/* Language & Theme (Moved from TopNavbar) */}
-          <div className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer mt-1 text-sm font-medium">
-            <Globe className="w-4 h-4 mr-2" /> English
-          </div>
-          <div className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer text-sm font-medium">
-            <LogOut className="w-4 h-4 mr-2" /> Logout
-          </div>
+          <div className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer mt-2 text-sm font-medium"><LogOut className="w-4 h-4 mr-2" /> Logout</div>
         </div>
 
         {/* Upgrade Card */}
@@ -83,4 +74,5 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     </>
   )
 }
+
 export default Sidebar
