@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
+import Auth from './pages/Auth'
 import Approvals from './pages/Approvals'
 import Security from './pages/Security'
 import FinOps from './pages/FinOps'
@@ -14,6 +15,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/auth" element={<Auth />} />
         <Route path="/" element={<Home />} />
         <Route path="/approvals" element={<Approvals />} />
         <Route path="/security" element={<Security />} />

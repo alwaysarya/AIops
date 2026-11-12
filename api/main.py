@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from passlib.context import CryptContext
+from jose import jwt
+from datetime import datetime, timedelta
 import sqlite3
-from datetime import datetime
 
 app = FastAPI()
 
@@ -14,19 +17,73 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+SECRET_KEY = "super_secret_key_opsmind"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 def init_db():
     conn = sqlite3.connect('aiops.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS agents
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, status TEXT, created_at TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS users
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT, role TEXT)''')
     conn.commit()
     conn.close()
 
 init_db()
 
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    role: str = "admin"
+
 class Agent(BaseModel):
     name: str
     type: str
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+@app.post("/api/v1/signup")
+def signup(user: UserCreate):
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE email = ?", (user.email,))
+    if c.fetchone():
+        conn.close()
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_pw = get_password_hash(user.password)
+    c.execute("INSERT INTO users (email, password, role) VALUES (?, ?, ?)", (user.email, hashed_pw, user.role))
+    conn.commit()
+    conn.close()
+    return {"message": "User created successfully"}
+
+@app.post("/api/v1/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("SELECT email, password, role FROM users WHERE email = ?", (form_data.username,))
+    user = c.fetchone()
+    conn.close()
+    
+    if not user or not verify_password(form_data.password, user[1]):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    
+    access_token = create_access_token(data={"sub": user[0], "role": user[2]})
+    return {"access_token": access_token, "token_type": "bearer", "role": user[2]}
 
 @app.post("/api/v1/agents")
 def create_agent(agent: Agent):
@@ -47,3 +104,28 @@ def get_agents():
     agents = [{"id": r[0], "name": r[1], "type": r[2], "status": r[3], "created_at": r[4]} for r in c.fetchall()]
     conn.close()
     return agents
+
+# --- Dashboard Mock Data (Taaki frontend na toote) ---
+@app.get("/api/v1/dashboard/stats")
+def get_dashboard_stats():
+    return {
+        "success_rate": 98.5,
+        "p95_latency": 124,
+        "token_usage": "1.2M",
+        "total_cost": "$24.50",
+        "cost_forecast": "$850.00",
+        "total_incidents": 12,
+        "open_incidents": 2,
+        "resolved_incidents": 10,
+        "total_logs": 152000,
+        "total_errors": 450,
+        "cpu_usage": 45.2,
+        "memory_usage": 62.1,
+        "live_runs": [
+            {"name": "user-service", "latency": "1.1s", "status": "Live"},
+            {"name": "auth-service", "latency": "0.9s", "status": "Live"},
+            {"name": "api-gateway", "latency": "0.4s", "status": "Live"},
+            {"name": "payment-service", "latency": "2.1s", "status": "Live"},
+            {"name": "mysql", "latency": "0.2s", "status": "Live"}
+        ]
+    }
