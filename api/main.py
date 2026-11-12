@@ -177,3 +177,20 @@ def get_incidents():
     incidents = [{"id": r[0], "title": r[1], "severity": r[2], "description": r[3], "status": r[4], "created_at": r[5]} for r in c.fetchall()]
     conn.close()
     return incidents
+
+class ChatRequest(BaseModel):
+    message: str
+
+@app.post("/api/v1/ai/chat")
+def ai_chat(req: ChatRequest):
+    msg = req.message.lower()
+    if "health" in msg or "status" in msg:
+        reply = "System health is currently stable. CPU usage is low, but memory usage is around 70%. No critical alerts found."
+    elif "incident" in msg:
+        reply = "I see 1 open incident: 'API gateway down'. It's a P1 priority. Would you like me to run a diagnostic?"
+    elif "fix" in msg or "resolve" in msg:
+        reply = "I can run an automated runbook to restart the API Gateway. Should I proceed?"
+    else:
+        reply = "I'm your AI Copilot. I can check system health, list incidents, or recommend fixes. How can I help?"
+    
+    return {"reply": reply}

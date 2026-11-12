@@ -52,7 +52,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <Link to="/security" className={getLinkClass('/security')}><span className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Policies</span></Link>
           
           <SectionTitle title="Report" />
-          <Link to="/cloud" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> Connectors</span></Link>
+          <Link to="/ai-copilot" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> AI Copilot</span></Link>
           <Link to="/metrics" className={getLinkClass('/metrics')}><span className="flex items-center"><Activity className="w-4 h-4 mr-2" /> Runtimes</span></Link>
           <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><span className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Audit</span></Link>
 
