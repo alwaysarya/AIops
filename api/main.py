@@ -194,3 +194,51 @@ def ai_chat(req: ChatRequest):
         reply = "I'm your AI Copilot. I can check system health, list incidents, or recommend fixes. How can I help?"
     
     return {"reply": reply}
+
+class CloudConnector(BaseModel):
+    provider: str
+    access_key: str
+    region: str
+
+@app.post("/api/v1/connectors")
+def add_connector(conn: CloudConnector):
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("INSERT INTO connectors (provider, access_key, region, status) VALUES (?, ?, ?, ?)",
+              (conn.provider, conn.access_key[:4] + "****" + conn.access_key[-4:], conn.region, "Connected"))
+    conn_db.commit()
+    conn_db.close()
+    return {"message": "Cloud account connected successfully"}
+
+@app.get("/api/v1/connectors")
+def get_connectors():
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("SELECT id, provider, access_key, region, status FROM connectors")
+    conns = [{"id": r[0], "provider": r[1], "access_key": r[2], "region": r[3], "status": r[4]} for r in c.fetchall()]
+    conn_db.close()
+    return conns
+
+class CloudConnector(BaseModel):
+    provider: str
+    access_key: str
+    region: str
+
+@app.post("/api/v1/connectors")
+def add_connector(conn: CloudConnector):
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("INSERT INTO connectors (provider, access_key, region, status) VALUES (?, ?, ?, ?)",
+              (conn.provider, conn.access_key[:4] + "****" + conn.access_key[-4:], conn.region, "Connected"))
+    conn_db.commit()
+    conn_db.close()
+    return {"message": "Cloud account connected successfully"}
+
+@app.get("/api/v1/connectors")
+def get_connectors():
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("SELECT id, provider, access_key, region, status FROM connectors")
+    conns = [{"id": r[0], "provider": r[1], "access_key": r[2], "region": r[3], "status": r[4]} for r in c.fetchall()]
+    conn_db.close()
+    return conns

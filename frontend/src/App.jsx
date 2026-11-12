@@ -15,12 +15,13 @@ import Metrics from './pages/Metrics'
 import Workspace from './pages/Workspace'
 import OldApprovals from './pages/actions/Approvals'
 import OldWorkspace from './pages/actions/Workspace'
+import ProtectedRoute from './components/Common/ProtectedRoute'
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/incidents" element={<Incidents />} />
         <Route path="/ai-copilot" element={<AICopilot />} />

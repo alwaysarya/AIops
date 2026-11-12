@@ -2,7 +2,13 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, CheckCircle, Shield, Link as LinkIcon, Activity, FileText, Settings, HelpCircle, LogOut, Zap, Search, X, Globe, Bot, Terminal } from 'lucide-react'
 
+import { useNavigate } from "react-router-dom"
 const Sidebar = ({ isOpen, setIsOpen }) => {
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    navigate("/auth")
+  }
   const location = useLocation()
   
   const getLinkClass = (path) => {
@@ -48,7 +54,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <Link to="/runbooks" className={getLinkClass('/runbooks')}><span className="flex items-center"><Terminal className="w-4 h-4 mr-2" /> Runbooks</span></Link>
 
           <SectionTitle title="Observability" />
-          <Link to="/cloud" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> Connectors</span></Link>
+          <Link to="/connect-data" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> Connectors</span></Link>
           <Link to="/metrics" className={getLinkClass('/metrics')}><span className="flex items-center"><Activity className="w-4 h-4 mr-2" /> Metrics</span></Link>
           <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><span className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Audit Logs</span></Link>
 
@@ -57,7 +63,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <Link to="/settings" className={getLinkClass('/settings')}><span className="flex items-center"><Settings className="w-4 h-4 mr-2" /> Settings</span></Link>
           <Link to="/help" className={getLinkClass('/help')}><span className="flex items-center"><HelpCircle className="w-4 h-4 mr-2" /> Help</span></Link>
           
-          <div className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer mt-2 text-sm font-medium"><LogOut className="w-4 h-4 mr-2" /> Logout</div>
+          <div onClick={handleLogout} className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer mt-2 text-sm font-medium"><LogOut className="w-4 h-4 mr-2" /> Logout</div>
         </div>
 
         {/* Upgrade Card */}
