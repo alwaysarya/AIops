@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Auth from './pages/Auth'
 import Incidents from './pages/Incidents'
 import AICopilot from './pages/AICopilot'
+import Runbooks from './pages/Runbooks'
 import Approvals from './pages/Approvals'
 import Security from './pages/Security'
 import FinOps from './pages/FinOps'
@@ -20,6 +21,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/incidents" element={<Incidents />} />
         <Route path="/ai-copilot" element={<AICopilot />} />
+        <Route path="/runbooks" element={<Runbooks />} />
         <Route path="/" element={<Home />} />
         <Route path="/approvals" element={<Approvals />} />
         <Route path="/security" element={<Security />} />
