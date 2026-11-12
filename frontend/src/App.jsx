@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Auth from './pages/Auth'
+import AuditLogs from './pages/AuditLogs'
 import Incidents from './pages/Incidents'
 import AICopilot from './pages/AICopilot'
 import Runbooks from './pages/Runbooks'
@@ -9,9 +10,11 @@ import NewAgent from './pages/actions/NewAgent'
 import ConnectData from './pages/actions/ConnectData'
 import Approvals from './pages/Approvals'
 import Security from './pages/Security'
+import Policies from './pages/Policies'
 import FinOps from './pages/FinOps'
 import ApiDocs from './pages/ApiDocs'
 import Metrics from './pages/Metrics'
+import Settings from './pages/Settings'
 import Workspace from './pages/Workspace'
 import OldApprovals from './pages/actions/Approvals'
 import OldWorkspace from './pages/actions/Workspace'
@@ -24,6 +27,7 @@ function App() {
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/incidents" element={<Incidents />} />
+        <Route path="/audit-logs" element={<AuditLogs />} />
         <Route path="/ai-copilot" element={<AICopilot />} />
         <Route path="/runbooks" element={<Runbooks />} />
         <Route path="/new-agent" element={<NewAgent />} />
@@ -31,9 +35,11 @@ function App() {
         
         <Route path="/approvals" element={<Approvals />} />
         <Route path="/security" element={<Security />} />
+        <Route path="/policies" element={<Policies />} />
         <Route path="/finops" element={<FinOps />} />
         <Route path="/api-docs" element={<ApiDocs />} />
         <Route path="/metrics" element={<Metrics />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/workspace" element={<Workspace />} />
         
         {/* Purane routes */}

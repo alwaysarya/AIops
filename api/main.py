@@ -94,6 +94,7 @@ def create_agent(agent: Agent):
               (agent.name, agent.type, "Active", datetime.now().isoformat()))
     conn.commit()
     agent_id = c.lastrowid
+    log_audit("CREATE_AGENT", f"Created new agent: {agent.name}")
     conn.close()
     return {"id": agent_id, "message": "Agent created successfully"}
 
@@ -242,3 +243,84 @@ def get_connectors():
     conns = [{"id": r[0], "provider": r[1], "access_key": r[2], "region": r[3], "status": r[4]} for r in c.fetchall()]
     conn_db.close()
     return conns
+
+def log_audit(action: str, details: str):
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("INSERT INTO audit_logs (action, details, timestamp) VALUES (?, ?, ?)",
+              (action, details, datetime.now().isoformat()))
+    conn_db.commit()
+    conn_db.close()
+
+@app.get("/api/v1/audit-logs")
+def get_audit_logs():
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("SELECT id, action, details, timestamp FROM audit_logs ORDER BY id DESC")
+    logs = [{"id": r[0], "action": r[1], "details": r[2], "timestamp": r[3]} for r in c.fetchall()]
+    conn_db.close()
+    return logs
+
+default_policies = [
+    {"id": 1, "name": "Enforce MFA", "desc": "All users must have MFA enabled.", "status": "Active", "severity": "Critical"},
+    {"id": 2, "name": "No Public S3 Buckets", "desc": "S3 buckets must not be publicly accessible.", "status": "Active", "severity": "High"},
+    {"id": 3, "name": "Require Encryption at Rest", "desc": "All databases must be encrypted.", "status": "Active", "severity": "High"},
+    {"id": 4, "name": "Root Account Access", "desc": "Root account should not have active access keys.", "status": "Inactive", "severity": "Critical"},
+    {"id": 5, "name": "Max Pod Limit", "desc": "Kubernetes cluster should not exceed 100 pods.", "status": "Active", "severity": "Medium"}
+]
+
+@app.get("/api/v1/policies")
+def get_policies():
+    return default_policies
+
+@app.put("/api/v1/policies/{policy_id}")
+def toggle_policy(policy_id: int):
+    global default_policies
+    for p in default_policies:
+        if p["id"] == policy_id:
+            p["status"] = "Inactive" if p["status"] == "Active" else "Active"
+            log_audit("TOGGLE_POLICY", f"Policy '{p['name']}' changed to {p['status']}")
+            return p
+    raise HTTPException(status_code=404, detail="Policy not found")
+
+@app.get("/api/v1/security/threats")
+def get_threats():
+    return [
+        {"id": 1, "type": "Vulnerability", "severity": "High", "resource": "api-gateway:v1.2", "status": "Open"},
+        {"id": 2, "type": "Secret Exposure", "severity": "Critical", "resource": "AWS_ACCESS_KEY", "status": "In Progress"},
+        {"id": 3, "type": "Misconfiguration", "severity": "Medium", "resource": "S3_Bucket_Logs", "status": "Resolved"}
+    ]
+
+class Approval(BaseModel):
+    title: str
+    requested_by: str
+
+@app.post("/api/v1/approvals")
+def create_approval(app_req: Approval):
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("INSERT INTO approvals (title, requested_by, status) VALUES (?, ?, ?)",
+              (app_req.title, app_req.requested_by, "Pending"))
+    conn_db.commit()
+    conn_db.close()
+    log_audit("CREATE_APPROVAL", f"Requested approval for: {app_req.title}")
+    return {"message": "Approval requested"}
+
+@app.get("/api/v1/approvals")
+def get_approvals():
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("SELECT id, title, requested_by, status FROM approvals ORDER BY id DESC")
+    res = [{"id": r[0], "title": r[1], "requested_by": r[2], "status": r[3]} for r in c.fetchall()]
+    conn_db.close()
+    return res
+
+@app.put("/api/v1/approvals/{app_id}")
+def update_approval(app_id: int, status: str):
+    conn_db = sqlite3.connect('aiops.db')
+    c = conn_db.cursor()
+    c.execute("UPDATE approvals SET status = ? WHERE id = ?", (status, app_id))
+    conn_db.commit()
+    conn_db.close()
+    log_audit("UPDATE_APPROVAL", f"Approval {app_id} marked as {status}")
+    return {"message": f"Approval {status}"}

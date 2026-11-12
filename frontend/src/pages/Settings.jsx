@@ -1,154 +1,67 @@
-import React, { useState, useEffect } from 'react'
-import TopNavbar from '../components/Common/TopNavbar'
-import Footer from '../components/Common/Footer'
-import { Save, Bell, UserPlus, Trash2, Shield } from 'lucide-react'
-import axios from 'axios'
+import React, { useState } from 'react'
+import PageLayout from '../components/layout/PageLayout'
+import { User, Bell, Moon, Lock } from 'lucide-react'
 
-const Settings = () => {
-  const [activeTab, setActiveTab] = useState('config')
-  const [settings, setSettings] = useState({ api_url: '', kafka_url: '', slack_webhook: '', alert_email: '' })
-  const [users, setUsers] = useState([])
-  const [newUser, setNewUser] = useState({ username: '', password: '', role: 'Viewer' })
-  const [message, setMessage] = useState('')
+export default function Settings() {
+  const [name, setName] = useState('Aryan Thakur')
+  const [email, setEmail] = useState('aryan@opsmind.com')
+  const [notifications, setNotifications] = useState(true)
 
-  // Load settings from DB on page load
-  useEffect(() => {
-    axios.get('http://localhost:8000/api/v1/settings/')
-      .then(res => setSettings(prev => ({ ...prev, ...res.data })))
-      .catch(err => console.error(err))
-  }, [])
-
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/api/v1/users/list')
-      setUsers(res.data.users)
-    } catch (e) { console.error(e) }
-  }
-
-  useEffect(() => { fetchUsers() }, [])
-
-  const handleSaveConfig = async () => {
-    try {
-      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'api_url', value: settings.api_url })
-      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'kafka_url', value: settings.kafka_url })
-      setMessage('✅ Configuration saved successfully!')
-      setTimeout(() => setMessage(''), 3000)
-    } catch (e) { setMessage('❌ Error saving config') }
-  }
-
-  const handleSaveNotifications = async () => {
-    try {
-      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'slack_webhook', value: settings.slack_webhook })
-      await axios.post('http://localhost:8000/api/v1/settings/', { key: 'alert_email', value: settings.alert_email })
-      setMessage('✅ Notification settings saved!')
-      setTimeout(() => setMessage(''), 3000)
-    } catch (e) { setMessage('❌ Error saving notifications') }
-  }
-
-  const handleAddUser = async (e) => {
+  const handleSave = (e) => {
     e.preventDefault()
-    try {
-      await axios.post('http://localhost:8000/api/v1/users/create', newUser)
-      setMessage('✅ User created successfully!')
-      setNewUser({ username: '', password: '', role: 'Viewer' })
-      fetchUsers()
-      setTimeout(() => setMessage(''), 3000)
-    } catch (err) {
-      setMessage('❌ Failed to create user (Username might exist)')
-    }
+    alert('Settings Saved Successfully!')
   }
 
   return (
-    <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden">
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar />
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-[1200px] mx-auto">
-            <h1 className="text-3xl font-semibold text-white tracking-tight mb-8">Settings</h1>
-
-            <div className="flex space-x-6 mb-8 border-b border-white/10">
-              <button onClick={() => setActiveTab('config')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'config' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>System Config</button>
-              <button onClick={() => setActiveTab('notifications')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'notifications' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Notifications</button>
-              <button onClick={() => setActiveTab('users')} className={`pb-3 font-medium text-sm transition-colors ${activeTab === 'users' ? 'text-white border-b-2 border-white' : 'text-zinc-500 hover:text-zinc-300'}`}>User Management</button>
+    <PageLayout title="Settings">
+      <div className="max-w-3xl space-y-6">
+        
+        {/* Profile Settings */}
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
+          <h3 className="text-white font-medium mb-4 flex items-center"><User className="w-4 h-4 mr-2"/> Profile Settings</h3>
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">Full Name</label>
+              <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#111113] border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-yellow-400" />
             </div>
+            <div>
+              <label className="block text-xs text-zinc-400 mb-1">Email Address</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#111113] border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-yellow-400" />
+            </div>
+            <button type="submit" className="bg-yellow-400 text-black font-bold py-2 px-6 rounded-lg text-sm hover:bg-yellow-500">Save Changes</button>
+          </form>
+        </div>
 
-            {message && <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm font-medium">{message}</div>}
-
-            {activeTab === 'config' && (
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 max-w-2xl">
-                <div className="mb-6">
-                  <label className="block text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">API Gateway URL</label>
-                  <input type="text" value={settings.api_url} onChange={(e) => setSettings({...settings, api_url: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
-                </div>
-                <div className="mb-6">
-                  <label className="block text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-2">Kafka Bootstrap Servers</label>
-                  <input type="text" value={settings.kafka_url} onChange={(e) => setSettings({...settings, kafka_url: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
-                </div>
-                <button onClick={handleSaveConfig} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
-                  <Save className="w-4 h-4 mr-2" /> Save Configuration
-                </button>
+        {/* Preferences */}
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
+          <h3 className="text-white font-medium mb-4 flex items-center"><Bell className="w-4 h-4 mr-2"/> Preferences</h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-white">Email Notifications</p>
+                <p className="text-xs text-zinc-500">Receive alerts for critical incidents</p>
               </div>
-            )}
-
-            {activeTab === 'notifications' && (
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 max-w-2xl">
-                <div className="mb-6 flex items-start space-x-4">
-                  <div className="p-3 bg-white/5 rounded-xl"><Bell className="w-6 h-6 text-yellow-400" /></div>
-                  <div className="flex-1">
-                    <h3 className="text-white font-medium mb-1">Alert Notifications</h3>
-                    <p className="text-zinc-500 text-sm mb-4">Send critical alerts to Slack or Email.</p>
-                    <div className="space-y-4">
-                      <input type="text" placeholder="Slack Webhook URL" value={settings.slack_webhook} onChange={(e) => setSettings({...settings, slack_webhook: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
-                      <input type="email" placeholder="Alert Email" value={settings.alert_email} onChange={(e) => setSettings({...settings, alert_email: e.target.value})} className="w-full bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex space-x-4 mt-8 pt-6 border-t border-white/5">
-                  <button onClick={handleSaveNotifications} className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
-                    <Save className="w-4 h-4 mr-2" /> Save Notifications
-                  </button>
-                </div>
+              <button onClick={() => setNotifications(!notifications)} className={`w-12 h-6 rounded-full transition-colors relative ${notifications ? 'bg-yellow-400' : 'bg-zinc-700'}`}>
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${notifications ? 'left-7' : 'left-1'}`}></div>
+              </button>
+            </div>
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-white">Dark Mode</p>
+                <p className="text-xs text-zinc-500">Currently enabled by default</p>
               </div>
-            )}
-
-            {activeTab === 'users' && (
-              <div className="space-y-6">
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8">
-                  <h3 className="text-lg font-medium text-white mb-4">Add New User</h3>
-                  <form onSubmit={handleAddUser} className="flex space-x-4">
-                    <input type="text" placeholder="Username" required value={newUser.username} onChange={(e) => setNewUser({...newUser, username: e.target.value})} className="flex-1 bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
-                    <input type="password" placeholder="Password" required value={newUser.password} onChange={(e) => setNewUser({...newUser, password: e.target.value})} className="flex-1 bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
-                    <select value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} className="bg-[#111113] text-white border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500">
-                      <option value="Admin">Admin</option>
-                      <option value="Viewer">Viewer</option>
-                    </select>
-                    <button type="submit" className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center"><UserPlus className="w-4 h-4 mr-2" /> Add</button>
-                  </form>
-                </div>
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden">
-                  <table className="w-full text-left">
-                    <thead className="bg-white/5 border-b border-white/10">
-                      <tr><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Username</th><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Org ID</th><th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase">Role</th></tr>
-                    </thead>
-                    <tbody>
-                      {users.map(user => (
-                        <tr key={user.id} className="border-b border-white/5 hover:bg-white/5">
-                          <td className="px-6 py-4 font-medium text-white">{user.username}</td>
-                          <td className="px-6 py-4 text-zinc-400">{user.org_id || 'N/A'}</td>
-                          <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md text-xs font-bold bg-zinc-500/10 text-zinc-400 border-zinc-500/20">Active</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+              <button className="bg-white/10 text-zinc-400 px-3 py-1.5 rounded-lg text-xs cursor-not-allowed"><Moon className="w-4 h-4 inline mr-1"/> Always On</button>
+            </div>
           </div>
-        </main>
-        <Footer />
+        </div>
+
+        {/* Security */}
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
+          <h3 className="text-white font-medium mb-4 flex items-center"><Lock className="w-4 h-4 mr-2"/> Security</h3>
+          <button onClick={() => alert('Password reset link sent to email!')} className="bg-white/5 border border-white/10 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/10">Change Password</button>
+        </div>
+
       </div>
-    </div>
+    </PageLayout>
   )
 }
-
-export default Settings

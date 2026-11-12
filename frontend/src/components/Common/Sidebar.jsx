@@ -1,14 +1,8 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CheckCircle, Shield, Link as LinkIcon, Activity, FileText, Settings, HelpCircle, LogOut, Zap, Search, X, Globe, Bot, Terminal } from 'lucide-react'
+import { LayoutDashboard, CheckCircle, Shield, Link as LinkIcon, Activity, FileText, Settings, HelpCircle, LogOut, Zap, Search, X, Globe, Bot, Terminal, ShieldAlert } from 'lucide-react'
 
-import { useNavigate } from "react-router-dom"
 const Sidebar = ({ isOpen, setIsOpen }) => {
-  const navigate = useNavigate()
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    navigate("/auth")
-  }
   const location = useLocation()
   
   const getLinkClass = (path) => {
@@ -24,7 +18,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       
       <aside className={`fixed lg:static top-0 left-0 z-50 w-[260px] bg-[#0A0A0A] border-r border-white/10 flex-shrink-0 flex flex-col h-screen transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         
-        {/* Logo */}
         <div className="pt-6 px-4 flex justify-between items-center shrink-0">
           <div className="flex items-center">
             <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-2"><Zap className="w-4 h-4 text-black" /></div>
@@ -33,15 +26,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <button className="lg:hidden text-zinc-400 hover:text-white" onClick={() => setIsOpen(false)}><X className="w-5 h-5" /></button>
         </div>
 
-        {/* Search */}
         <div className="relative px-4 mt-6 shrink-0">
           <Search className="w-4 h-4 absolute left-7 top-1/2 transform -translate-y-1/2 text-zinc-500" />
           <input type="text" placeholder="Search..." className="w-full bg-[#111113] text-zinc-300 text-xs rounded-lg pl-9 pr-4 py-2 border border-white/5 focus:outline-none" />
         </div>
 
-        {/* Scrollable Links */}
         <div className="flex-1 overflow-y-auto px-3 py-2">
-          
           <SectionTitle title="General" />
           <Link to="/" className={getLinkClass('/')}><span className="flex items-center"><LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard</span></Link>
           
@@ -54,19 +44,19 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <Link to="/runbooks" className={getLinkClass('/runbooks')}><span className="flex items-center"><Terminal className="w-4 h-4 mr-2" /> Runbooks</span></Link>
 
           <SectionTitle title="Observability" />
-          <Link to="/connect-data" className={getLinkClass('/cloud')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> Connectors</span></Link>
+          <Link to="/connect-data" className={getLinkClass('/connect-data')}><span className="flex items-center"><LinkIcon className="w-4 h-4 mr-2" /> Connectors</span></Link>
           <Link to="/metrics" className={getLinkClass('/metrics')}><span className="flex items-center"><Activity className="w-4 h-4 mr-2" /> Metrics</span></Link>
           <Link to="/audit-logs" className={getLinkClass('/audit-logs')}><span className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Audit Logs</span></Link>
+          <Link to="/security" className={getLinkClass('/security')}><span className="flex items-center"><ShieldAlert className="w-4 h-4 mr-2" /> Security Center</span></Link>
 
           <SectionTitle title="Security & Admin" />
-          <Link to="/security" className={getLinkClass('/security')}><span className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Policies</span></Link>
+          <Link to="/policies" className={getLinkClass('/policies')}><span className="flex items-center"><Shield className="w-4 h-4 mr-2" /> Policies</span></Link>
           <Link to="/settings" className={getLinkClass('/settings')}><span className="flex items-center"><Settings className="w-4 h-4 mr-2" /> Settings</span></Link>
           <Link to="/help" className={getLinkClass('/help')}><span className="flex items-center"><HelpCircle className="w-4 h-4 mr-2" /> Help</span></Link>
           
-          <div onClick={handleLogout} className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer mt-2 text-sm font-medium"><LogOut className="w-4 h-4 mr-2" /> Logout</div>
+          <div className="flex items-center px-3 py-2 text-zinc-400 hover:text-white cursor-pointer mt-2 text-sm font-medium"><LogOut className="w-4 h-4 mr-2" /> Logout</div>
         </div>
 
-        {/* Upgrade Card */}
         <div className="p-4 shrink-0">
           <div className="bg-gradient-to-br from-zinc-900 to-black border border-white/10 rounded-xl p-4 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-500/20 blur-2xl rounded-full"></div>
