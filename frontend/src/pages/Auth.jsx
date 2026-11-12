@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import toast from "react-hot-toast"
 import { useNavigate } from 'react-router-dom'
 
 export default function Auth() {
@@ -29,7 +30,7 @@ export default function Auth() {
       } else {
         // Signup logic
         await axios.post('http://localhost:8005/api/v1/signup', { email, password, role: 'admin' })
-        alert('Account created! Please login.')
+        toast.success("Account created! Please login.")
         setIsLogin(true)
       }
     } catch (err) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Search, Globe, Sun, Bell, Menu, LogOut, User, Settings } from 'lucide-react'
+import { Search, Globe, Sun, Bell, Menu, LogOut, Settings } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const TopNavbar = ({ setIsOpen }) => {
@@ -10,11 +10,19 @@ const TopNavbar = ({ setIsOpen }) => {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    if (searchQuery.toLowerCase().includes('agent')) navigate('/new-agent')
-    else if (searchQuery.toLowerCase().includes('incident')) navigate('/incidents')
-    else if (searchQuery.toLowerCase().includes('runbook')) navigate('/runbooks')
-    else if (searchQuery.toLowerCase().includes('cloud')) navigate('/connect-data')
-    else alert('No results found for: ' + searchQuery)
+    const q = searchQuery.toLowerCase()
+    if (!q) return
+    if (q.includes('agent')) navigate('/new-agent')
+    else if (q.includes('incident')) navigate('/incidents')
+    else if (q.includes('runbook') || q.includes('fix')) navigate('/runbooks')
+    else if (q.includes('cloud') || q.includes('connect')) navigate('/connect-data')
+    else if (q.includes('policy') || q.includes('policies')) navigate('/policies')
+    else if (q.includes('security')) navigate('/security')
+    else if (q.includes('audit')) navigate('/audit-logs')
+    else if (q.includes('setting')) navigate('/settings')
+    else if (q.includes('metric')) navigate('/metrics')
+    else if (q.includes('ai') || q.includes('copilot')) navigate('/ai-copilot')
+    else navigate('/')
   }
 
   return (
