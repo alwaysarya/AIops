@@ -28,6 +28,7 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS agents
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, status TEXT, created_at TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS incidents (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, severity TEXT, description TEXT, status TEXT, created_at TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT, role TEXT)''')
     conn.commit()
@@ -129,3 +130,50 @@ def get_dashboard_stats():
             {"name": "mysql", "latency": "0.2s", "status": "Live"}
         ]
     }
+
+import psutil
+
+@app.get("/api/v1/system/metrics")
+def get_system_metrics():
+    return {
+        "cpu_percent": psutil.cpu_percent(interval=0.5),
+        "memory_percent": psutil.virtual_memory().percent,
+        "disk_percent": psutil.disk_usage('/').percent,
+        "boot_time": psutil.boot_time()
+    }
+
+import psutil
+
+@app.get("/api/v1/system/metrics")
+def get_system_metrics():
+    return {
+        "cpu_percent": psutil.cpu_percent(interval=0.5),
+        "memory_percent": psutil.virtual_memory().percent,
+        "disk_percent": psutil.disk_usage('/').percent,
+        "boot_time": psutil.boot_time()
+    }
+
+class Incident(BaseModel):
+    title: str
+    severity: str
+    description: str
+
+@app.post("/api/v1/incidents")
+def create_incident(incident: Incident):
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO incidents (title, severity, description, status, created_at) VALUES (?, ?, ?, ?, ?)",
+              (incident.title, incident.severity, incident.description, "Open", datetime.now().isoformat()))
+    conn.commit()
+    incident_id = c.lastrowid
+    conn.close()
+    return {"id": incident_id, "message": "Incident created successfully"}
+
+@app.get("/api/v1/incidents")
+def get_incidents():
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("SELECT id, title, severity, description, status, created_at FROM incidents ORDER BY id DESC")
+    incidents = [{"id": r[0], "title": r[1], "severity": r[2], "description": r[3], "status": r[4], "created_at": r[5]} for r in c.fetchall()]
+    conn.close()
+    return incidents

@@ -4,19 +4,26 @@ import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, ArrowDownRight, ClipboardCheck, Layout, MoreHorizontal, X } from 'lucide-react'
+import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, ArrowDownRight, ClipboardCheck, Layout, MoreHorizontal, X, Cpu, HardDrive } from 'lucide-react'
 
 const Home = () => {
   const [stats, setStats] = useState(null)
+  const [sysMetrics, setSysMetrics] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [showDemoModal, setShowDemoModal] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetch = () => axios.get('http://localhost:8000/api/v1/dashboard/stats').then(r => setStats(r.data)).catch(e => console.error(e))
-    fetch(); const int = setInterval(fetch, 5000); return () => clearInterval(int)
+    const fetchData = () => {
+      axios.get('http://localhost:8000/api/v1/dashboard/stats').then(r => setStats(r.data)).catch(e => console.error(e))
+      axios.get('http://localhost:8000/api/v1/system/metrics').then(r => setSysMetrics(r.data)).catch(e => console.error(e))
+    }
+    fetchData()
+    const int = setInterval(fetchData, 5000)
+    return () => clearInterval(int)
   }, [])
-  if (!stats) return <div className="flex h-screen bg-[#030303] text-white items-center justify-center">Loading Real Data...</div>
+
+  if (!stats || !sysMetrics) return <div className="flex h-screen bg-[#030303] text-white items-center justify-center">Loading Real Data...</div>
 
   return (
     <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden relative">
@@ -120,25 +127,27 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5 flex flex-col">
-                <div className="flex justify-between items-center mb-2"><h3 className="text-white font-medium">Compliance pulse</h3><MoreHorizontal className="w-4 h-4 text-zinc-600" /></div>
-                <div className="flex-1 flex flex-col items-center justify-center relative mt-4 mb-2">
-                  <div className="relative w-[180px] h-[90px]">
-                    <svg width="100%" height="100%" viewBox="0 0 200 100" className="overflow-visible">
-                      <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" strokeLinecap="round" />
-                      <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#F97316" strokeWidth="16" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="50" />
-                      <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#22C55E" strokeWidth="16" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="130" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-1">
-                      <span className="text-[10px] text-zinc-400 mb-0.5">Policy Coverage</span>
-                      <span className="text-2xl lg:text-3xl font-bold text-white leading-none">94%</span>
+              {/* NAYA: SYSTEM METRICS CARD */}
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-white font-medium mb-4 flex items-center"><Cpu className="w-4 h-4 mr-2 text-zinc-400"/> System Health</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-[10px] mb-1"><span className="text-zinc-400">CPU Usage</span><span className="text-white font-bold">{sysMetrics.cpu_percent}%</span></div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-blue-500 rounded-full transition-all duration-500" style={{ width: `${sysMetrics.cpu_percent}%` }}></div></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[10px] mb-1"><span className="text-zinc-400">Memory Usage</span><span className="text-white font-bold">{sysMetrics.memory_percent}%</span></div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-purple-500 rounded-full transition-all duration-500" style={{ width: `${sysMetrics.memory_percent}%` }}></div></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[10px] mb-1"><span className="text-zinc-400">Disk Usage</span><span className="text-white font-bold">{sysMetrics.disk_percent}%</span></div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-orange-500 rounded-full transition-all duration-500" style={{ width: `${sysMetrics.disk_percent}%` }}></div></div>
                     </div>
                   </div>
                 </div>
-                <div className="space-y-1.5 mt-2">
-                  {[{n:'Data Privacy (DAT-001)', s:'Active', c:'text-green-400 bg-green-500/10'}, {n:'Approval Gates (APR-002)', s:'Active', c:'text-green-400 bg-green-500/10'}, {n:'Security Training (SEC-003)', s:'1 Draft', c:'text-orange-400 bg-orange-500/10'}, {n:'Incident Response Plan (IRP-004)', s:'Under Review', c:'text-blue-400 bg-blue-500/10'}].map((it, i) => (
-                    <div key={i} className="flex justify-between items-center text-[10px] p-2 bg-[#111113] rounded border border-white/5"><span className="text-zinc-300">{it.n}</span><span className={`${it.c} px-2 py-0.5 rounded font-medium`}>{it.s}</span></div>
-                  ))}
+                <div className="mt-6 flex items-center justify-center text-[10px] text-zinc-500 bg-white/5 rounded border border-white/5 p-2">
+                  <HardDrive className="w-3 h-3 mr-2"/> Real-time System Metrics
                 </div>
               </div>
 
