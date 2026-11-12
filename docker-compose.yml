@@ -1,21 +1,19 @@
 version: '3.8'
 
 services:
-  api-gateway:
-    build: ./services/api-gateway
+  backend:
+    build: .
     ports:
-      - "8081:8000"  # Host port 8081, Container port 8000
+      - "8005:8005"
     environment:
-      - LOG_LEVEL=INFO
-
-  ai-detector:
-    build: ./services/ai-anomaly-detector
-    ports:
-      - "8005:8001"  # Host port 8002, Container port 8001
+      - JWT_SECRET_KEY=super_secret_opsmind_key_2026
+      - DATABASE_URL=aiops.db
+    volumes:
+      - ./aiops.db:/app/aiops.db
 
   frontend:
     build: ./frontend
     ports:
-      - "3002:80"    # Host port 3002, Container port 80
+      - "3000:80"
     depends_on:
-      - api-gateway
+      - backend
