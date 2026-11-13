@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import Logo from "./Logo"
 import { LayoutDashboard, CheckCircle, Shield, Link as LinkIcon, Activity, FileText, Settings, HelpCircle, LogOut, Zap, Search, X, Globe, Bot, Terminal, ShieldAlert } from 'lucide-react'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {

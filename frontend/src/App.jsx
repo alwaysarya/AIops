@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import ProtectedRoute from './components/Common/ProtectedRoute'
+import SplashScreen from './components/Common/SplashScreen'
 
 import Home from './pages/Home'
 import Auth from './pages/Auth'
@@ -21,31 +22,37 @@ import ConnectData from './pages/actions/ConnectData'
 import Workspace from './pages/Workspace'
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true)
+
   return (
-    <Router>
-      <Toaster position="top-right" toastOptions={{
-        style: { background: '#111113', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }
-      }} />
-      <Routes>
-        <Route path="/auth" element={<Auth />} />
-        
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/incidents" element={<ProtectedRoute><Incidents /></ProtectedRoute>} />
-        <Route path="/ai-copilot" element={<ProtectedRoute><AICopilot /></ProtectedRoute>} />
-        <Route path="/runbooks" element={<ProtectedRoute><Runbooks /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
-        <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
-        <Route path="/policies" element={<ProtectedRoute><Policies /></ProtectedRoute>} />
-        <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
-        <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
-        <Route path="/finops" element={<ProtectedRoute><FinOps /></ProtectedRoute>} />
-        <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
-        <Route path="/new-agent" element={<ProtectedRoute><NewAgent /></ProtectedRoute>} />
-        <Route path="/connect-data" element={<ProtectedRoute><ConnectData /></ProtectedRoute>} />
-        <Route path="/workspace" element={<ProtectedRoute><Workspace /></ProtectedRoute>} />
-      </Routes>
-    </Router>
+    <>
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+      
+      <Router>
+        <Toaster position="top-right" toastOptions={{
+          style: { background: '#111113', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }
+        }} />
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          
+          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/incidents" element={<ProtectedRoute><Incidents /></ProtectedRoute>} />
+          <Route path="/ai-copilot" element={<ProtectedRoute><AICopilot /></ProtectedRoute>} />
+          <Route path="/runbooks" element={<ProtectedRoute><Runbooks /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
+          <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} />
+          <Route path="/policies" element={<ProtectedRoute><Policies /></ProtectedRoute>} />
+          <Route path="/approvals" element={<ProtectedRoute><Approvals /></ProtectedRoute>} />
+          <Route path="/metrics" element={<ProtectedRoute><Metrics /></ProtectedRoute>} />
+          <Route path="/finops" element={<ProtectedRoute><FinOps /></ProtectedRoute>} />
+          <Route path="/api-docs" element={<ProtectedRoute><ApiDocs /></ProtectedRoute>} />
+          <Route path="/new-agent" element={<ProtectedRoute><NewAgent /></ProtectedRoute>} />
+          <Route path="/connect-data" element={<ProtectedRoute><ConnectData /></ProtectedRoute>} />
+          <Route path="/workspace" element={<ProtectedRoute><Workspace /></ProtectedRoute>} />
+        </Routes>
+      </Router>
+    </>
   )
 }
 
