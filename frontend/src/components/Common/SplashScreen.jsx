@@ -1,240 +1,183 @@
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
-const pipeline = [
-  { name: 'SOURCE', detail: 'Code integration', x: 90 },
-  { name: 'BUILD', detail: 'Artifact generation', x: 270 },
-  { name: 'TEST', detail: 'Quality validation', x: 450 },
-  { name: 'STAGING', detail: 'Environment sync', x: 630 },
-  { name: 'DEPLOY', detail: 'Infrastructure rollout', x: 810 },
-  { name: 'RELEASE', detail: 'Production delivery', x: 990 }
+const stages = [
+  { name: 'SOURCE', detail: 'Code integration', icon: '01' },
+  { name: 'BUILD', detail: 'Artifact creation', icon: '02' },
+  { name: 'TEST', detail: 'Quality assurance', icon: '03' },
+  { name: 'STAGING', detail: 'Environment sync', icon: '04' },
+  { name: 'DEPLOY', detail: 'Infrastructure', icon: '05' },
+  { name: 'RELEASE', detail: 'Production', icon: '06' },
 ]
 
 const messages = [
-  'Establishing secure infrastructure...',
-  'Connecting cloud environments...',
-  'Preparing build pipelines...',
-  'Executing quality validation...',
-  'Synchronizing deployment environments...',
-  'Finalizing platform initialization...'
+  'Establishing secure infrastructure',
+  'Synchronizing source repositories',
+  'Compiling deployment artifacts',
+  'Executing quality validation',
+  'Provisioning cloud environments',
+  'Preparing production services',
 ]
 
 function InfinityMark() {
   return (
-    <svg viewBox="0 0 400 210" className="om-infinity">
+    <svg viewBox="0 0 320 180" className="infinity-mark" fill="none">
       <defs>
-        <linearGradient id="omChrome" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#FFFFFF" />
-          <stop offset=".2" stopColor="#64748B" />
-          <stop offset=".43" stopColor="#F8FAFC" />
-          <stop offset=".68" stopColor="#94A3B8" />
-          <stop offset="1" stopColor="#FFFFFF" />
+        <linearGradient id="infinitySilver" x1="30" y1="10" x2="280" y2="170">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="20%" stopColor="#8997A8" />
+          <stop offset="38%" stopColor="#F9FAFC" />
+          <stop offset="58%" stopColor="#9CA9B8" />
+          <stop offset="76%" stopColor="#F8F9FC" />
+          <stop offset="100%" stopColor="#68788C" />
         </linearGradient>
 
-        <linearGradient id="omAmber" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#B45309" />
-          <stop offset=".5" stopColor="#FBBF24" />
-          <stop offset="1" stopColor="#EA580C" />
+        <linearGradient id="infinityGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#9D6231" />
+          <stop offset="50%" stopColor="#FFD69A" />
+          <stop offset="100%" stopColor="#B77A42" />
         </linearGradient>
 
-        <filter id="omGlow">
-          <feGaussianBlur stdDeviation="7" />
+        <filter id="infinityBlur">
+          <feGaussianBlur stdDeviation="9" />
         </filter>
       </defs>
 
-      {/* Soft ambient light */}
+      {/* Soft metallic illumination */}
       <path
-        d="M200 105 C135 8 25 8 25 105 S135 202 200 105 S375 8 375 105 S265 202 200 105Z"
-        fill="none"
-        stroke="#F59E0B"
-        strokeWidth="17"
-        opacity=".22"
-        filter="url(#omGlow)"
+        d="M160 90 C112 18 24 18 24 90 S112 162 160 90 S296 18 296 90 S208 162 160 90"
+        stroke="#E4A75F"
+        strokeWidth="20"
+        opacity=".18"
+        filter="url(#infinityBlur)"
       />
 
-      {/* Metallic infinity */}
+      {/* Main chrome ribbon */}
       <path
-        d="M200 105 C135 8 25 8 25 105 S135 202 200 105 S375 8 375 105 S265 202 200 105Z"
-        fill="none"
-        stroke="url(#omChrome)"
-        strokeWidth="13"
+        d="M160 90 C112 18 24 18 24 90 S112 162 160 90 S296 18 296 90 S208 162 160 90"
+        stroke="url(#infinitySilver)"
+        strokeWidth="11"
         strokeLinecap="round"
       />
 
-      {/* Amber inner edge */}
+      {/* Fine inner highlight */}
       <path
-        d="M200 105 C135 8 25 8 25 105 S135 202 200 105 S375 8 375 105 S265 202 200 105Z"
-        fill="none"
-        stroke="url(#omAmber)"
-        strokeWidth="2.2"
+        d="M160 90 C112 18 24 18 24 90 S112 162 160 90 S296 18 296 90 S208 162 160 90"
+        stroke="#FFFFFF"
+        strokeWidth="1.5"
+        opacity=".7"
         strokeLinecap="round"
-        strokeDasharray="125 600"
-        className="om-logo-flow"
+        strokeDasharray="95 450"
+        className="ribbon-highlight"
       />
 
-      {/* Moving light */}
-      <circle r="5" fill="#FDE68A" filter="url(#omGlow)">
-        <animateMotion
-          dur="4s"
-          repeatCount="indefinite"
-          path="M200 105 C135 8 25 8 25 105 S135 202 200 105 S375 8 375 105 S265 202 200 105Z"
-        />
-      </circle>
+      {/* Champagne accent */}
+      <path
+        d="M160 90 C112 18 24 18 24 90 S112 162 160 90 S296 18 296 90 S208 162 160 90"
+        stroke="url(#infinityGold)"
+        strokeWidth="2"
+        opacity=".85"
+        strokeLinecap="round"
+        strokeDasharray="75 450"
+        className="ribbon-gold"
+      />
     </svg>
   )
 }
 
-function PipelineVisual({ progress }) {
+function StageTimeline({ progress }) {
+  const active = Math.min(
+    Math.floor(progress / (100 / stages.length)),
+    stages.length - 1
+  )
+
   return (
-    <div className="om-pipeline">
-      <svg viewBox="0 0 1080 230" className="om-pipeline-svg">
-        <defs>
-          <linearGradient id="omPath" x1="0" y1="0" x2="1" y2="0">
-            <stop stopColor="#38BDF8" />
-            <stop offset=".48" stopColor="#64748B" />
-            <stop offset="1" stopColor="#F59E0B" />
-          </linearGradient>
+    <section className="stage-section">
+      <div className="section-heading">
+        <div>
+          <span className="section-kicker">THE DELIVERY LIFECYCLE</span>
+          <h3>From commit to production.</h3>
+        </div>
+        <span className="section-count">06 STAGES</span>
+      </div>
 
-          <filter id="omNodeGlow">
-            <feGaussianBlur stdDeviation="4" />
-          </filter>
-        </defs>
+      <div className="stage-list">
+        <div className="stage-line">
+          <div
+            className="stage-line-active"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
 
-        {/* Main connection path */}
-        <path
-          d="M90 112 H990"
-          fill="none"
-          stroke="#273548"
-          strokeWidth="1.5"
-        />
-
-        <path
-          d="M90 112 H990"
-          fill="none"
-          stroke="url(#omPath)"
-          strokeWidth="1.5"
-          strokeDasharray="4 8"
-          className="om-path-dash"
-        />
-
-        {/* Active progress path */}
-        <path
-          d="M90 112 H990"
-          fill="none"
-          stroke="url(#omPath)"
-          strokeWidth="2"
-          pathLength="100"
-          strokeDasharray={`${progress} 100`}
-          className="om-path-progress"
-        />
-
-        {/* Nodes */}
-        {pipeline.map((stage, i) => {
-          const active = progress >= (i * 20)
-          const x = stage.x
+        {stages.map((stage, index) => {
+          const complete = progress >= ((index + 1) / 6) * 100
+          const selected = index === active
 
           return (
-            <g key={stage.name}>
-              {active && (
-                <circle
-                  cx={x}
-                  cy="112"
-                  r="15"
-                  fill={i < 4 ? '#38BDF8' : '#F59E0B'}
-                  opacity=".15"
-                  filter="url(#omNodeGlow)"
-                />
-              )}
+            <div className="stage-item" key={stage.name}>
+              <div className={`stage-point ${
+                complete ? 'complete' : ''
+              } ${selected ? 'selected' : ''}`}>
+                {complete ? '✓' : ''}
+              </div>
 
-              <circle
-                cx={x}
-                cy="112"
-                r="7"
-                fill="#070C13"
-                stroke={active ? (i < 4 ? '#38BDF8' : '#F59E0B') : '#475569'}
-                strokeWidth="1.8"
-              />
+              <span className={`stage-number ${
+                selected ? 'selected-text' : ''
+              }`}>
+                {stage.icon}
+              </span>
 
-              <circle
-                cx={x}
-                cy="112"
-                r="2.5"
-                fill={active ? '#F8FAFC' : '#64748B'}
-              />
-
-              <text
-                x={x}
-                y="72"
-                textAnchor="middle"
-                fill={active ? '#F8FAFC' : '#64748B'}
-                fontSize="12"
-                fontWeight="600"
-                letterSpacing="1.5"
-              >
+              <strong className={selected ? 'selected-text' : ''}>
                 {stage.name}
-              </text>
+              </strong>
 
-              <text
-                x={x}
-                y="150"
-                textAnchor="middle"
-                fill="#8493A7"
-                fontSize="10"
-              >
+              <span className="stage-description">
                 {stage.detail}
-              </text>
-
-              <path
-                d={`M${x} 88V104`}
-                stroke={active ? '#64748B' : '#334155'}
-                strokeWidth="1"
-              />
-            </g>
+              </span>
+            </div>
           )
         })}
-
-        {/* Moving pipeline signal */}
-        <circle r="5" fill="#FDE68A" className="om-signal">
-          <animateMotion
-            dur="4s"
-            repeatCount="indefinite"
-            path="M90 112 H990"
-          />
-        </circle>
-      </svg>
-    </div>
+      </div>
+    </section>
   )
 }
 
 export default function SplashScreen({ onFinish }) {
   const [progress, setProgress] = useState(0)
   const [exiting, setExiting] = useState(false)
+  const finishRef = useRef(onFinish)
 
   useEffect(() => {
-    let current = 0
+    finishRef.current = onFinish
+  }, [onFinish])
+
+  useEffect(() => {
+    let value = 0
     let finishTimer
     let exitTimer
 
     const interval = setInterval(() => {
-      current = Math.min(current + 1, 100)
-      setProgress(current)
+      value = Math.min(value + 2, 100)
+      setProgress(value)
 
-      if (current >= 100) {
+      if (value === 100) {
         clearInterval(interval)
 
         finishTimer = setTimeout(() => {
           setExiting(true)
-          exitTimer = setTimeout(() => onFinish?.(), 800)
-        }, 500)
+          exitTimer = setTimeout(() => {
+            finishRef.current?.()
+          }, 550)
+        }, 250)
       }
-    }, 40)
+    }, 50)
 
     return () => {
       clearInterval(interval)
       clearTimeout(finishTimer)
       clearTimeout(exitTimer)
     }
-  }, [onFinish])
+  }, [])
 
   const messageIndex = Math.min(
     Math.floor(progress / 17),
@@ -244,94 +187,120 @@ export default function SplashScreen({ onFinish }) {
   return (
     <div className={`om-screen ${exiting ? 'om-exit' : ''}`}>
 
-      <div className="om-backdrop" />
-      <div className="om-grain" />
+      {/* BACKGROUND ARCHITECTURE */}
 
-      {/* HEADER */}
+      <div className="om-background">
+        <div className="om-light om-light-blue" />
+        <div className="om-light om-light-gold" />
+        <div className="om-grid" />
+
+        <div className="om-light-beam" />
+
+        {Array.from({ length: 18 }, (_, i) => (
+          <span
+            key={i}
+            className="om-particle"
+            style={{
+              left: `${(i * 47 + 9) % 100}%`,
+              top: `${(i * 31 + 17) % 100}%`,
+              animationDelay: `${(i % 6) * .8}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* TOP NAVIGATION */}
+
       <header className="om-header">
         <div className="om-brand">
-          <div className="om-brand-mark">
+          <div className="om-small-mark">
             <InfinityMark />
           </div>
-
-          <div className="om-brand-name">
-            <strong>OPSMIND</strong>
-            <span>AUTONOMOUS OPERATIONS</span>
+          <div>
+            <div className="om-brand-name">OPSMIND</div>
+            <div className="om-brand-caption">
+              INFRASTRUCTURE PLATFORM
+            </div>
           </div>
         </div>
 
-        <div className="om-header-status">
+        <div className="om-system-state">
           <span className="om-live-dot" />
-          <span>PLATFORM INITIALIZING</span>
+          SYSTEM INITIALIZING
+          <span className="om-version">PLATFORM / 01.0</span>
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN EXPERIENCE */}
+
       <main className="om-main">
 
-        <section className="om-intro">
-          <div className="om-overline">
-            INTELLIGENT INFRASTRUCTURE PLATFORM
+        {/* HERO */}
+
+        <section className="om-hero">
+          <div className="om-eyebrow">
+            <span />
+            ENGINEERED FOR CONTINUOUS DELIVERY
+            <span />
           </div>
 
           <h1>
-            Built to move
-            <span> engineering forward.</span>
+            Engineering without
+            <br />
+            <span>boundaries.</span>
           </h1>
 
           <p>
-            One platform. Every environment. Continuous delivery.
+            From code to cloud. Every stage, intelligently connected.
           </p>
         </section>
 
-        {/* CENTRAL SIGNATURE VISUAL */}
-        <section className="om-signature">
+        {/* INFINITY BRAND EXPERIENCE */}
+
+        <section className="om-identity">
 
           <div className="om-orbit om-orbit-one" />
           <div className="om-orbit om-orbit-two" />
 
-          <div className="om-logo-container">
+          <div className="om-logo-glow" />
+
+          <div className="om-logo-wrap">
             <InfinityMark />
           </div>
 
-          <div className="om-logo-reflection" />
+          <h2>OPSMIND</h2>
 
-          <div className="om-signature-caption">
-            <span>CONTINUOUS</span>
-            <i />
-            <span>CONNECTED</span>
-            <i />
-            <span>INTELLIGENT</span>
+          <div className="om-tagline">
+            INTELLIGENT OPERATIONS. WITHOUT LIMITS.
           </div>
 
-        </section>
+          <div className="om-gold-divider" />
 
-        {/* PIPELINE */}
-        <section className="om-workflow">
-
-          <div className="om-workflow-heading">
-            <span>DELIVERY WORKFLOW</span>
-            <span>01 — 06</span>
+          <div className="om-brand-caption-large">
+            AUTONOMOUS INFRASTRUCTURE
           </div>
-
-          <PipelineVisual progress={progress} />
-
         </section>
 
-        {/* LOADING */}
-        <section className="om-loading">
+        {/* DELIVERY TIMELINE */}
 
-          <div className="om-loading-top">
+        <StageTimeline progress={progress} />
+
+        {/* INITIALIZATION CONSOLE */}
+
+        <section className="om-console">
+
+          <div className="om-console-top">
             <div>
-              <span className="om-loading-label">
-                INITIALIZING YOUR WORKSPACE
+              <span className="om-console-kicker">
+                PLATFORM INITIALIZATION
               </span>
-              <div className="om-message" key={messageIndex}>
+              <div className="om-console-message" key={messageIndex}>
+                <span className="om-status-bullet" />
                 {messages[messageIndex]}
               </div>
             </div>
 
-            <div className="om-percent">
+            <div className="om-percentage">
               {String(progress).padStart(2, '0')}
               <span>%</span>
             </div>
@@ -339,533 +308,722 @@ export default function SplashScreen({ onFinish }) {
 
           <div className="om-progress-track">
             <div
-              className="om-progress-value"
+              className="om-progress-fill"
               style={{ width: `${progress}%` }}
+            />
+            <div
+              className="om-progress-shine"
+              style={{ left: `${Math.max(0, progress - 2)}%` }}
             />
           </div>
 
-          <div className="om-loading-bottom">
+          <div className="om-console-bottom">
             <span>SECURE INITIALIZATION</span>
-            <span>OPSMIND SYSTEMS</span>
+            <span>{progress === 100 ? 'READY' : 'IN PROGRESS'}</span>
           </div>
 
         </section>
-
       </main>
 
       {/* FOOTER */}
+
       <footer className="om-footer">
-        <span>ENGINEERED FOR SCALE</span>
-        <span>© OPSMIND</span>
-        <span>INTELLIGENCE IN MOTION</span>
+        <span>BUILT FOR MODERN INFRASTRUCTURE</span>
+        <div className="om-footer-links">
+          <span>INFRASTRUCTURE</span>
+          <i />
+          <span>ORCHESTRATION</span>
+          <i />
+          <span>AUTOMATION</span>
+        </div>
+        <span>OPSMIND © 2026</span>
       </footer>
 
       <style>{`
 
         .om-screen {
-          --om-blue: #67C8F5;
-          --om-amber: #D99A45;
+          --bg: #05080D;
+          --white: #F5F7FB;
+          --muted: #8190A2;
+          --blue: #4EBCEB;
+          --gold: #E6A35A;
+
           position: fixed;
           inset: 0;
           z-index: 99999;
+          overflow: hidden;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          overflow: hidden;
-          padding: 30px 5%;
-          color: #F8FAFC;
-          background: #05070B;
+          padding: 25px 5.2% 17px;
+          background: var(--bg);
+          color: var(--white);
           font-family: Inter, -apple-system, BlinkMacSystemFont,
             "SF Pro Display", "Segoe UI", sans-serif;
-          transition: opacity .8s ease, transform .8s ease;
           isolation: isolate;
+          transition: opacity .55s ease, transform .55s ease;
         }
 
-        .om-screen *,
-        .om-screen *::before,
-        .om-screen *::after {
+        .om-screen * {
           box-sizing: border-box;
         }
 
         .om-exit {
           opacity: 0;
-          transform: scale(1.02);
+          transform: scale(1.025);
           pointer-events: none;
         }
 
-        .om-backdrop {
-          position: absolute;
-          inset: 0;
-          z-index: -2;
-          background:
-            radial-gradient(ellipse at 50% 42%,
-              rgba(27,52,76,.48), transparent 45%),
-            radial-gradient(ellipse at 50% 100%,
-              rgba(107,64,27,.11), transparent 42%),
-            #05070B;
-        }
+        /* BACKGROUND */
 
-        .om-grain {
+        .om-background {
           position: absolute;
           inset: 0;
           z-index: -1;
-          opacity: .13;
+          overflow: hidden;
           pointer-events: none;
+        }
+
+        .om-light {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(110px);
+        }
+
+        .om-light-blue {
+          width: 700px;
+          height: 450px;
+          left: 5%;
+          top: 0;
+          background: rgba(18, 75, 124, .19);
+        }
+
+        .om-light-gold {
+          width: 600px;
+          height: 350px;
+          right: -15%;
+          bottom: -15%;
+          background: rgba(135, 81, 38, .13);
+        }
+
+        .om-grid {
+          position: absolute;
+          inset: 0;
+          opacity: .12;
           background-image:
-            linear-gradient(transparent 50%, rgba(255,255,255,.015) 50%);
-          background-size: 100% 4px;
+            linear-gradient(rgba(132,164,190,.12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(132,164,190,.12) 1px, transparent 1px);
+          background-size: 75px 75px;
+          mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        }
+
+        .om-light-beam {
+          position: absolute;
+          top: 0;
+          left: -30%;
+          width: 35%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(116,171,205,.025), transparent);
+          transform: skewX(-20deg);
+          animation: omBeam 12s linear infinite;
+        }
+
+        .om-particle {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: #67C7EF;
+          border-radius: 50%;
+          opacity: .3;
+          animation: omParticle 4s ease-in-out infinite alternate;
         }
 
         /* HEADER */
 
         .om-header {
           width: 100%;
-          max-width: 1450px;
+          max-width: 1500px;
+          margin: 0 auto;
           display: flex;
-          justify-content: space-between;
           align-items: center;
+          justify-content: space-between;
           flex-shrink: 0;
-          animation: omEnter .8s both;
+          animation: omReveal .8s both;
         }
 
         .om-brand {
           display: flex;
           align-items: center;
-          gap: 13px;
+          gap: 12px;
         }
 
-        .om-brand-mark {
-          width: 39px;
-          height: 24px;
+        .om-small-mark {
+          width: 38px;
+          height: 25px;
         }
 
-        .om-brand-mark svg {
+        .om-small-mark .infinity-mark {
           width: 100%;
+          height: 100%;
         }
 
         .om-brand-name {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-
-        .om-brand-name strong {
-          font-size: 14px;
-          letter-spacing: .27em;
+          font-size: 12px;
+          letter-spacing: .29em;
           font-weight: 750;
         }
 
-        .om-brand-name span {
-          font-size: 7px;
-          color: #76869A;
+        .om-brand-caption {
+          color: #75869A;
+          font-size: 6px;
           letter-spacing: .22em;
+          margin-top: 5px;
         }
 
-        .om-header-status {
+        .om-system-state {
           display: flex;
           align-items: center;
           gap: 9px;
-          color: #9AA9B9;
-          font-size: 8px;
-          letter-spacing: .16em;
+          color: #8292A5;
+          font-size: 7px;
+          letter-spacing: .17em;
         }
 
         .om-live-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #D99A45;
-          box-shadow: 0 0 12px #D99A45;
-          animation: omPulse 1.5s infinite;
+          background: var(--gold);
+          box-shadow: 0 0 12px var(--gold);
+          animation: omBlink 1.5s infinite;
+        }
+
+        .om-version {
+          color: #526276;
+          margin-left: 14px;
         }
 
         /* MAIN */
 
         .om-main {
           width: 100%;
-          max-width: 1160px;
-          flex: 1;
+          max-width: 1130px;
           min-height: 0;
+          flex: 1;
+          margin: 0 auto;
           display: flex;
           flex-direction: column;
           justify-content: center;
-          align-items: center;
         }
 
-        /* INTRO */
+        /* HERO */
 
-        .om-intro {
+        .om-hero {
           text-align: center;
-          animation: omEnter 1s .1s both;
+          animation: omReveal .9s .1s both;
         }
 
-        .om-overline {
-          color: #D7A85D;
-          font-size: 9px;
+        .om-eyebrow {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 13px;
+          color: #D7A15F;
+          font-size: 7px;
+          font-weight: 700;
           letter-spacing: .28em;
-          font-weight: 650;
-          margin-bottom: 17px;
+          margin-bottom: 16px;
         }
 
-        .om-intro h1 {
+        .om-eyebrow span {
+          width: 20px;
+          height: 1px;
+          background: #B9844B;
+        }
+
+        .om-hero h1 {
           margin: 0;
-          font-size: clamp(30px, 4vw, 53px);
-          letter-spacing: -.055em;
-          line-height: 1.13;
-          font-weight: 620;
+          color: #F6F8FB;
+          font-size: clamp(34px, 4.8vw, 61px);
+          font-weight: 680;
+          line-height: 1.08;
+          letter-spacing: -.065em;
         }
 
-        .om-intro h1 span {
-          display: block;
-          color: #8593A5;
+        .om-hero h1 span {
+          background: linear-gradient(100deg, #9CAABD, #F1F4F8);
+          color: transparent;
+          background-clip: text;
         }
 
-        .om-intro p {
-          font-size: 12px;
-          color: #8593A5;
-          margin-top: 15px;
-          letter-spacing: .015em;
+        .om-hero p {
+          margin: 13px 0 0;
+          color: #8292A5;
+          font-size: 10px;
+          letter-spacing: .035em;
         }
 
-        /* SIGNATURE */
+        /* IDENTITY */
 
-        .om-signature {
-          width: min(100%, 650px);
-          height: clamp(170px, 25vh, 245px);
+        .om-identity {
+          height: clamp(210px, 30vh, 290px);
           position: relative;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          margin: 4px 0 0;
+          margin: 4px 0;
+          animation: omReveal 1s .2s both;
         }
 
-        .om-logo-container {
-          width: clamp(180px, 27vw, 290px);
+        .om-logo-wrap {
+          width: clamp(180px, 24vw, 250px);
           position: relative;
-          z-index: 3;
-          filter: drop-shadow(0 0 22px rgba(180,145,95,.12));
+          z-index: 2;
+          filter: drop-shadow(0 0 16px rgba(223,165,103,.19));
           animation: omFloat 5s ease-in-out infinite;
         }
 
-        .om-infinity {
-          display: block;
+        .infinity-mark {
           width: 100%;
           overflow: visible;
         }
 
-        .om-logo-flow {
-          animation: omDash 5s linear infinite;
+        .ribbon-highlight {
+          animation: omShimmer 5s linear infinite;
+        }
+
+        .ribbon-gold {
+          animation: omShimmer 7s linear infinite reverse;
+        }
+
+        .om-logo-glow {
+          position: absolute;
+          width: 220px;
+          height: 100px;
+          border-radius: 50%;
+          background: rgba(191,130,70,.12);
+          filter: blur(55px);
         }
 
         .om-orbit {
           position: absolute;
-          border: 1px solid rgba(148,163,184,.13);
+          width: 390px;
+          height: 135px;
+          border: 1px solid rgba(115,158,194,.13);
           border-radius: 50%;
-          transform: rotate(-13deg);
-          pointer-events: none;
         }
 
         .om-orbit-one {
-          width: 440px;
-          height: 110px;
-          animation: omOrbit 15s linear infinite;
+          transform: rotate(-17deg);
+          animation: omOrbit 24s linear infinite;
         }
 
         .om-orbit-two {
-          width: 510px;
-          height: 145px;
-          transform: rotate(12deg);
-          border-color: rgba(217,154,69,.09);
-          animation: omOrbit 22s linear infinite reverse;
+          width: 330px;
+          height: 165px;
+          border-color: rgba(213,151,84,.10);
+          transform: rotate(35deg);
+          animation: omOrbitReverse 32s linear infinite;
         }
 
-        .om-logo-reflection {
-          position: absolute;
-          width: 250px;
-          height: 45px;
-          bottom: 17px;
-          background: rgba(217,154,69,.12);
-          filter: blur(35px);
-          border-radius: 50%;
+        .om-identity h2 {
+          z-index: 2;
+          margin: -1px 0 0;
+          font-size: clamp(25px, 3.2vw, 37px);
+          letter-spacing: .29em;
+          padding-left: .29em;
+          font-weight: 680;
+          color: transparent;
+          background: linear-gradient(#FFFFFF, #A9B4C2);
+          background-clip: text;
         }
 
-        .om-signature-caption {
-          position: absolute;
-          bottom: 0;
-          display: flex;
-          align-items: center;
-          gap: 13px;
-          color: #8290A0;
-          font-size: 8px;
-          letter-spacing: .2em;
+        .om-tagline {
+          z-index: 2;
+          margin-top: 8px;
+          color: #8593A5;
+          font-size: 7px;
+          letter-spacing: .28em;
         }
 
-        .om-signature-caption i {
-          width: 3px;
-          height: 3px;
-          background: #D99A45;
-          border-radius: 50%;
+        .om-gold-divider {
+          width: 35px;
+          height: 2px;
+          background: #DDA15C;
+          margin-top: 14px;
+          box-shadow: 0 0 12px rgba(222,158,82,.5);
         }
 
-        /* WORKFLOW */
-
-        .om-workflow {
-          width: 100%;
-          margin-top: 15px;
-          animation: omEnter 1s .3s both;
+        .om-brand-caption-large {
+          margin-top: 10px;
+          color: #526477;
+          font-size: 6px;
+          letter-spacing: .24em;
         }
 
-        .om-workflow-heading {
-          display: flex;
-          justify-content: space-between;
-          padding: 0 4%;
-          color: #8998AA;
-          font-size: 8px;
-          letter-spacing: .19em;
+        /* TIMELINE */
+
+        .stage-section {
+          margin-top: 8px;
+          animation: omReveal .9s .3s both;
         }
 
-        .om-pipeline {
-          width: 100%;
-          margin-top: 4px;
-        }
-
-        .om-pipeline-svg {
-          width: 100%;
-          display: block;
-          overflow: visible;
-        }
-
-        .om-path-dash {
-          animation: omPathDash 3s linear infinite;
-        }
-
-        .om-path-progress {
-          transition: stroke-dasharray .2s linear;
-        }
-
-        .om-signal {
-          filter: drop-shadow(0 0 6px #F59E0B);
-        }
-
-        /* LOADING */
-
-        .om-loading {
-          width: min(100%, 650px);
-          margin-top: 18px;
-          animation: omEnter 1s .5s both;
-        }
-
-        .om-loading-top {
+        .section-heading {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          margin-bottom: 12px;
+          align-items: flex-end;
+          margin-bottom: 25px;
         }
 
-        .om-loading-label {
-          color: #D7A85D;
-          font-size: 8px;
+        .section-kicker {
+          color: #D8A363;
+          font-size: 7px;
+          letter-spacing: .22em;
+        }
+
+        .section-heading h3 {
+          font-size: clamp(17px, 2vw, 23px);
+          font-weight: 580;
+          letter-spacing: -.045em;
+          margin: 7px 0 0;
+          color: #F2F4F8;
+        }
+
+        .section-count {
+          color: #66778B;
+          font-size: 7px;
           letter-spacing: .18em;
         }
 
-        .om-message {
-          color: #9AA7B5;
-          font-size: 11px;
-          margin-top: 7px;
-          animation: omEnter .3s both;
+        .stage-list {
+          display: flex;
+          justify-content: space-between;
+          position: relative;
         }
 
-        .om-percent {
+        .stage-line {
+          position: absolute;
+          top: 6px;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: #354455;
+        }
+
+        .stage-line-active {
+          height: 100%;
+          background: linear-gradient(90deg, #50BCEB, #E4A25A);
+          box-shadow: 0 0 8px rgba(221,160,86,.5);
+          transition: width .12s linear;
+        }
+
+        .stage-item {
+          position: relative;
+          z-index: 1;
+          width: 16.66%;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .stage-point {
+          width: 13px;
+          height: 13px;
+          border: 1px solid #61758C;
+          border-radius: 50%;
+          background: #080D14;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #7CCCF0;
+          font-size: 8px;
+          transition: .3s;
+        }
+
+        .stage-point.complete {
+          border-color: #56BCE8;
+          background: #0B1E2B;
+        }
+
+        .stage-point.selected {
+          border-color: #E5A35B;
+          box-shadow: 0 0 13px rgba(229,163,91,.55);
+          transform: scale(1.15);
+        }
+
+        .stage-number {
+          color: #64778D;
+          font-size: 6px;
+          letter-spacing: .13em;
+          margin-top: 10px;
+        }
+
+        .stage-item strong {
+          color: #C1CBD7;
+          font-size: 8px;
+          letter-spacing: .16em;
+          margin-top: 6px;
+          font-weight: 650;
+        }
+
+        .stage-item .selected-text {
+          color: #E5B376;
+        }
+
+        .stage-description {
+          color: #748499;
+          font-size: 8px;
+          margin-top: 5px;
+        }
+
+        /* CONSOLE */
+
+        .om-console {
+          width: min(100%, 480px);
+          margin: 28px auto 0;
+          animation: omReveal .9s .4s both;
+        }
+
+        .om-console-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 13px;
+        }
+
+        .om-console-kicker {
+          color: #C99B61;
+          font-size: 7px;
+          letter-spacing: .2em;
+        }
+
+        .om-console-message {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          color: #8796A8;
+          font-size: 9px;
+          margin-top: 9px;
+          animation: omReveal .3s both;
+        }
+
+        .om-status-bullet {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #E5A35A;
+          box-shadow: 0 0 8px #E5A35A;
+        }
+
+        .om-percentage {
           font-size: 24px;
-          font-weight: 500;
-          letter-spacing: -.04em;
+          font-weight: 600;
+          letter-spacing: -.05em;
+          font-variant-numeric: tabular-nums;
         }
 
-        .om-percent span {
-          font-size: 12px;
-          color: #8B98A7;
+        .om-percentage span {
+          color: #A1ADBA;
+          font-size: 13px;
           margin-left: 2px;
         }
 
         .om-progress-track {
-          height: 2px;
-          background: #283442;
+          height: 4px;
+          width: 100%;
           position: relative;
+          background: #202D3A;
+          border-radius: 8px;
           overflow: hidden;
         }
 
-        .om-progress-value {
+        .om-progress-fill {
           height: 100%;
-          background: linear-gradient(90deg,#B77932,#F8D28B);
-          box-shadow: 0 0 12px rgba(217,154,69,.55);
-          transition: width .1s linear;
-          position: relative;
+          border-radius: inherit;
+          background: linear-gradient(90deg, #B47B3E, #E8B36D, #FFF0CC);
+          box-shadow: 0 0 12px rgba(235,169,93,.55);
+          transition: width .12s linear;
         }
 
-        .om-progress-value::after {
-          content: "";
+        .om-progress-shine {
           position: absolute;
-          right: 0;
-          width: 25px;
+          top: 0;
+          width: 2px;
           height: 100%;
-          background: #FFF1CF;
-          filter: blur(4px);
+          background: white;
+          box-shadow: 0 0 8px white;
         }
 
-        .om-loading-bottom {
+        .om-console-bottom {
           display: flex;
           justify-content: space-between;
-          margin-top: 10px;
-          color: #627286;
-          font-size: 7px;
-          letter-spacing: .17em;
+          border-top: 1px solid rgba(126,147,169,.14);
+          padding-top: 10px;
+          margin-top: 13px;
+          font-size: 6px;
+          letter-spacing: .19em;
+          color: #63758A;
         }
 
         /* FOOTER */
 
         .om-footer {
+          max-width: 1500px;
           width: 100%;
-          max-width: 1450px;
+          flex-shrink: 0;
+          margin: 0 auto;
+          border-top: 1px solid rgba(126,147,169,.15);
+          padding-top: 12px;
           display: flex;
           justify-content: space-between;
-          flex-shrink: 0;
-          border-top: 1px solid rgba(148,163,184,.13);
-          padding-top: 13px;
-          color: #657386;
-          font-size: 8px;
+          align-items: center;
+          color: #718196;
+          font-size: 6px;
           letter-spacing: .15em;
+        }
+
+        .om-footer-links {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .om-footer-links i {
+          width: 3px;
+          height: 3px;
+          background: #D49A56;
+          border-radius: 50%;
         }
 
         /* MOTION */
 
-        @keyframes omEnter {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        @keyframes omReveal {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes omFloat {
-          50% { transform: translateY(-7px); }
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
         }
 
-        @keyframes omPulse {
-          50% { opacity: .35; }
-        }
-
-        @keyframes omDash {
-          to { stroke-dashoffset: -725; }
-        }
-
-        @keyframes omPathDash {
-          to { stroke-dashoffset: -48; }
+        @keyframes omShimmer {
+          to { stroke-dashoffset: -545; }
         }
 
         @keyframes omOrbit {
-          to { transform: rotate(347deg); }
+          to { transform: rotate(343deg); }
+        }
+
+        @keyframes omOrbitReverse {
+          to { transform: rotate(-325deg); }
+        }
+
+        @keyframes omParticle {
+          from { opacity: .12; transform: scale(.7); }
+          to { opacity: .65; transform: scale(1.5); }
+        }
+
+        @keyframes omBlink {
+          50% { opacity: .3; }
+        }
+
+        @keyframes omBeam {
+          from { left: -35%; }
+          to { left: 120%; }
         }
 
         /* RESPONSIVE */
 
-        @media(max-width: 700px) {
+        @media (max-width: 650px) {
           .om-screen {
-            padding: 20px 18px;
+            padding: 19px 18px 13px;
           }
 
-          .om-brand-name strong {
-            font-size: 12px;
+          .om-version {
+            display: none;
           }
 
-          .om-header-status {
+          .om-system-state {
             font-size: 6px;
           }
 
-          .om-intro h1 {
-            font-size: 32px;
+          .om-hero h1 {
+            font-size: clamp(31px, 8vw, 43px);
           }
 
-          .om-intro p {
-            font-size: 10px;
+          .om-hero p {
+            font-size: 8px;
           }
 
-          .om-signature {
-            height: 170px;
+          .om-identity {
+            height: 210px;
           }
 
-          .om-logo-container {
+          .om-logo-wrap {
             width: 185px;
           }
 
           .om-orbit-one {
             width: 290px;
-            height: 80px;
           }
 
           .om-orbit-two {
-            width: 320px;
-            height: 100px;
+            width: 260px;
           }
 
-          .om-pipeline {
-            width: 145%;
-            margin-left: -22.5%;
+          .section-heading h3 {
+            font-size: 17px;
           }
 
-          .om-pipeline-svg text {
-            font-size: 13px;
+          .stage-description {
+            font-size: 6px;
           }
 
-          .om-loading {
-            margin-top: 8px;
+          .stage-item strong {
+            font-size: 6px;
           }
 
           .om-footer {
-            font-size: 6px;
+            font-size: 5px;
+            letter-spacing: .04em;
+          }
+
+          .om-footer-links {
+            gap: 5px;
           }
         }
 
-        @media(max-height: 720px) {
+        @media (max-height: 740px) {
           .om-screen {
-            padding-top: 13px;
-            padding-bottom: 12px;
+            padding-top: 12px;
+            padding-bottom: 10px;
           }
 
-          .om-intro h1 {
-            font-size: 31px;
+          .om-identity {
+            height: 180px;
           }
 
-          .om-intro p {
-            margin-top: 8px;
+          .om-logo-wrap {
+            width: 165px;
           }
 
-          .om-signature {
-            height: 145px;
+          .om-console {
+            margin-top: 16px;
           }
 
-          .om-logo-container {
-            width: 175px;
-          }
-
-          .om-workflow {
-            margin-top: 5px;
-          }
-
-          .om-loading {
-            margin-top: 7px;
+          .section-heading {
+            margin-bottom: 18px;
           }
         }
 
-        @media(prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce) {
           .om-screen *,
           .om-screen *::before,
           .om-screen *::after {
             animation-duration: .01ms !important;
             animation-iteration-count: 1 !important;
-            transition-duration: .01ms !important;
+            scroll-behavior: auto !important;
           }
         }
 
