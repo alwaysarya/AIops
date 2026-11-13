@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PageLayout from '../components/layout/PageLayout'
 import axios from 'axios'
-import { AlertCircle, Plus } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { AlertCircle, Plus, Download } from 'lucide-react'
 
 export default function Incidents() {
   const [incidents, setIncidents] = useState([])
@@ -27,10 +28,24 @@ export default function Incidents() {
       await axios.post('http://localhost:8005/api/v1/incidents', formData)
       setFormData({ title: '', severity: 'P2', description: '' })
       fetchIncidents()
+      toast.success('Incident created successfully!')
     } catch (err) {
-      alert('Error creating incident')
+      toast.error('Error creating incident')
     }
     setLoading(false)
+  }
+
+  const exportToCSV = () => {
+    if (incidents.length === 0) return toast.error('No incidents to export')
+    const headers = ['ID,Title,Severity,Description,Status,Created At\n']
+    const csvData = incidents.map(i => `${i.id},"${i.title}","${i.severity}","${i.description}","${i.status}","${i.created_at}"`).join('\n')
+    const blob = new Blob([headers + csvData], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'incidents_report.csv'
+    a.click()
+    toast.success('Report Downloaded!')
   }
 
   const getSeverityColor = (sev) => {
@@ -68,8 +83,14 @@ export default function Incidents() {
             </button>
           </form>
         </div>
+
         <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
-          <h3 className="text-white font-medium mb-4 flex items-center"><AlertCircle className="w-4 h-4 mr-2"/> Active Incidents ({incidents.length})</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-white font-medium flex items-center"><AlertCircle className="w-4 h-4 mr-2"/> Active Incidents ({incidents.length})</h3>
+            <button onClick={exportToCSV} className="bg-white/5 border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-white/10 flex items-center transition-colors">
+              <Download className="w-3 h-3 mr-2"/> Export CSV
+            </button>
+          </div>
           <div className="space-y-3">
             {incidents.length === 0 ? <p className="text-zinc-500 text-sm">No incidents reported yet.</p> : incidents.map(inc => (
               <div key={inc.id} className="bg-[#111113] border border-white/5 rounded-lg p-4 flex flex-col gap-2">

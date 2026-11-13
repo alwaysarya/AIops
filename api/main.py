@@ -8,7 +8,24 @@ from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
+
+import os
+import psycopg2
 import sqlite3
+from psycopg2.extras import RealDictCursor
+
+DATABASE_URL = os.getenv("DATABASE_URL", "aiops.db")
+
+def get_db():
+    if os.getenv("ENVIRONMENT") == "production":
+        # PostgreSQL Connection (Docker)
+        conn = psycopg2.connect(DATABASE_URL)
+        return conn
+    else:
+        # SQLite Connection (Local)
+        conn = get_db()
+        return conn
+
 
 app = FastAPI()
 
@@ -27,7 +44,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def init_db():
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS agents
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type TEXT, status TEXT, created_at TEXT)''')
@@ -62,7 +79,7 @@ def create_access_token(data: dict):
 
 @app.post("/api/v1/signup")
 def signup(user: UserCreate):
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE email = ?", (user.email,))
     if c.fetchone():
@@ -77,7 +94,7 @@ def signup(user: UserCreate):
 
 @app.post("/api/v1/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("SELECT email, password, role FROM users WHERE email = ?", (form_data.username,))
     user = c.fetchone()
@@ -91,7 +108,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @app.post("/api/v1/agents")
 def create_agent(agent: Agent):
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("INSERT INTO agents (name, type, status, created_at) VALUES (?, ?, ?, ?)",
               (agent.name, agent.type, "Active", datetime.now().isoformat()))
@@ -103,7 +120,7 @@ def create_agent(agent: Agent):
 
 @app.get("/api/v1/agents")
 def get_agents():
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id, name, type, status, created_at FROM agents ORDER BY id DESC")
     agents = [{"id": r[0], "name": r[1], "type": r[2], "status": r[3], "created_at": r[4]} for r in c.fetchall()]
@@ -164,7 +181,7 @@ class Incident(BaseModel):
 
 @app.post("/api/v1/incidents")
 def create_incident(incident: Incident):
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("INSERT INTO incidents (title, severity, description, status, created_at) VALUES (?, ?, ?, ?, ?)",
               (incident.title, incident.severity, incident.description, "Open", datetime.now().isoformat()))
@@ -175,7 +192,7 @@ def create_incident(incident: Incident):
 
 @app.get("/api/v1/incidents")
 def get_incidents():
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id, title, severity, description, status, created_at FROM incidents ORDER BY id DESC")
     incidents = [{"id": r[0], "title": r[1], "severity": r[2], "description": r[3], "status": r[4], "created_at": r[5]} for r in c.fetchall()]
@@ -206,7 +223,7 @@ class CloudConnector(BaseModel):
 
 @app.post("/api/v1/connectors")
 def add_connector(conn: CloudConnector):
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("INSERT INTO connectors (provider, access_key, region, status) VALUES (?, ?, ?, ?)",
               (conn.provider, conn.access_key[:4] + "****" + conn.access_key[-4:], conn.region, "Connected"))
@@ -216,7 +233,7 @@ def add_connector(conn: CloudConnector):
 
 @app.get("/api/v1/connectors")
 def get_connectors():
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("SELECT id, provider, access_key, region, status FROM connectors")
     conns = [{"id": r[0], "provider": r[1], "access_key": r[2], "region": r[3], "status": r[4]} for r in c.fetchall()]
@@ -230,7 +247,7 @@ class CloudConnector(BaseModel):
 
 @app.post("/api/v1/connectors")
 def add_connector(conn: CloudConnector):
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("INSERT INTO connectors (provider, access_key, region, status) VALUES (?, ?, ?, ?)",
               (conn.provider, conn.access_key[:4] + "****" + conn.access_key[-4:], conn.region, "Connected"))
@@ -240,7 +257,7 @@ def add_connector(conn: CloudConnector):
 
 @app.get("/api/v1/connectors")
 def get_connectors():
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("SELECT id, provider, access_key, region, status FROM connectors")
     conns = [{"id": r[0], "provider": r[1], "access_key": r[2], "region": r[3], "status": r[4]} for r in c.fetchall()]
@@ -248,7 +265,7 @@ def get_connectors():
     return conns
 
 def log_audit(action: str, details: str):
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("INSERT INTO audit_logs (action, details, timestamp, actor) VALUES (?, ?, ?, ?)",
               (action, details, datetime.now().isoformat(), "Admin"))
@@ -257,7 +274,7 @@ def log_audit(action: str, details: str):
 
 @app.get("/api/v1/audit-logs")
 def get_audit_logs():
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("SELECT id, action, details, timestamp FROM audit_logs ORDER BY id DESC")
     logs = [{"id": r[0], "action": r[1], "details": r[2], "timestamp": r[3]} for r in c.fetchall()]
@@ -300,7 +317,7 @@ class Approval(BaseModel):
 
 @app.post("/api/v1/approvals")
 def create_approval(app_req: Approval):
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("INSERT INTO approvals (title, requested_by, status) VALUES (?, ?, ?)",
               (app_req.title, app_req.requested_by, "Pending"))
@@ -311,7 +328,7 @@ def create_approval(app_req: Approval):
 
 @app.get("/api/v1/approvals")
 def get_approvals():
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("SELECT id, title, requested_by, status FROM approvals ORDER BY id DESC")
     res = [{"id": r[0], "title": r[1], "requested_by": r[2], "status": r[3]} for r in c.fetchall()]
@@ -320,7 +337,7 @@ def get_approvals():
 
 @app.put("/api/v1/approvals/{app_id}")
 def update_approval(app_id: int, status: str):
-    conn_db = sqlite3.connect('aiops.db')
+    conn_db = get_db()
     c = conn_db.cursor()
     c.execute("UPDATE approvals SET status = ? WHERE id = ?", (status, app_id))
     conn_db.commit()
@@ -331,7 +348,7 @@ def update_approval(app_id: int, status: str):
 # --- Multi-Tenancy Support ---
 # Users table mein organization column add karna
 try:
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("ALTER TABLE users ADD COLUMN organization TEXT DEFAULT 'Default Org'")
     conn.commit()
@@ -345,7 +362,7 @@ class OrgUpdate(BaseModel):
 
 @app.post("/api/v1/update-org")
 def update_org(data: OrgUpdate):
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("UPDATE users SET organization = ? WHERE email = ?", (data.organization, data.email))
     conn.commit()
@@ -354,7 +371,7 @@ def update_org(data: OrgUpdate):
 
 @app.get("/api/v1/user/{email}")
 def get_user_info(email: str):
-    conn = sqlite3.connect('aiops.db')
+    conn = get_db()
     c = conn.cursor()
     c.execute("SELECT email, role, organization FROM users WHERE email = ?", (email,))
     user = c.fetchone()

@@ -26,7 +26,7 @@ export default function Auth() {
         const res = await axios.post('http://localhost:8005/api/v1/login', formData)
         localStorage.setItem('token', res.data.access_token)
         localStorage.setItem('role', res.data.role)
-        navigate('/')
+        navigate("/dashboard")
       } else {
         // Signup logic
         await axios.post('http://localhost:8005/api/v1/signup', { email, password, role: 'admin' })
