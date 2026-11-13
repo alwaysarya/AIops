@@ -379,3 +379,29 @@ def get_user_info(email: str):
     if user:
         return {"email": user[0], "role": user[1], "organization": user[2]}
     return {"error": "User not found"}
+
+@app.post("/api/v1/aws/resources")
+def get_aws_resources(creds: AWSConnect):
+    try:
+        session = boto3.Session(
+            aws_access_key_id=creds.access_key,
+            aws_secret_access_key=creds.secret_key,
+            region_name=creds.region
+        )
+        
+        # Fetch S3 Buckets
+        s3 = session.client('s3')
+        buckets = [b['Name'] for b in s3.list_buckets().get('Buckets', [])]
+        
+        # Fetch EC2 Instances
+        ec2 = session.client('ec2')
+        instances = ec2.describe_instances()
+        ec2_count = sum(len(r['Instances']) for r in instances['Reservations'])
+        
+        return {
+            "success": True, 
+            "s3_buckets": buckets, 
+            "ec2_instances_count": ec2_count
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
