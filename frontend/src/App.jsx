@@ -5,6 +5,7 @@ import ProtectedRoute from './components/Common/ProtectedRoute'
 import SplashScreen from './components/Common/SplashScreen'
 
 import Home from './pages/Home'
+import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import Incidents from './pages/Incidents'
 import AICopilot from './pages/AICopilot'
@@ -33,9 +34,12 @@ function App() {
           style: { background: '#111113', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }
         }} />
         <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/incidents" element={<ProtectedRoute><Incidents /></ProtectedRoute>} />
           <Route path="/ai-copilot" element={<ProtectedRoute><AICopilot /></ProtectedRoute>} />
           <Route path="/runbooks" element={<ProtectedRoute><Runbooks /></ProtectedRoute>} />

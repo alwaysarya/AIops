@@ -1,15 +1,27 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: opsmind
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     build: .
     ports:
       - "8005:8005"
     environment:
       - JWT_SECRET_KEY=super_secret_opsmind_key_2026
-      - DATABASE_URL=aiops.db
-    volumes:
-      - ./aiops.db:/app/aiops.db
+      - DATABASE_URL=postgresql://admin:adminpassword@db:5432/opsmind
+      - PORT=8005
+    depends_on:
+      - db
 
   frontend:
     build: ./frontend
@@ -17,3 +29,6 @@ services:
       - "3000:80"
     depends_on:
       - backend
+
+volumes:
+  postgres_data:

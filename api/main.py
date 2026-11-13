@@ -5,6 +5,9 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import os
 import sqlite3
 
 app = FastAPI()
@@ -247,8 +250,8 @@ def get_connectors():
 def log_audit(action: str, details: str):
     conn_db = sqlite3.connect('aiops.db')
     c = conn_db.cursor()
-    c.execute("INSERT INTO audit_logs (action, details, timestamp) VALUES (?, ?, ?)",
-              (action, details, datetime.now().isoformat()))
+    c.execute("INSERT INTO audit_logs (action, details, timestamp, actor) VALUES (?, ?, ?, ?)",
+              (action, details, datetime.now().isoformat(), "Admin"))
     conn_db.commit()
     conn_db.close()
 
@@ -324,3 +327,38 @@ def update_approval(app_id: int, status: str):
     conn_db.close()
     log_audit("UPDATE_APPROVAL", f"Approval {app_id} marked as {status}")
     return {"message": f"Approval {status}"}
+
+# --- Multi-Tenancy Support ---
+# Users table mein organization column add karna
+try:
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("ALTER TABLE users ADD COLUMN organization TEXT DEFAULT 'Default Org'")
+    conn.commit()
+    conn.close()
+except:
+    pass
+
+class OrgUpdate(BaseModel):
+    email: str
+    organization: str
+
+@app.post("/api/v1/update-org")
+def update_org(data: OrgUpdate):
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("UPDATE users SET organization = ? WHERE email = ?", (data.organization, data.email))
+    conn.commit()
+    conn.close()
+    return {"message": "Organization updated"}
+
+@app.get("/api/v1/user/{email}")
+def get_user_info(email: str):
+    conn = sqlite3.connect('aiops.db')
+    c = conn.cursor()
+    c.execute("SELECT email, role, organization FROM users WHERE email = ?", (email,))
+    user = c.fetchone()
+    conn.close()
+    if user:
+        return {"email": user[0], "role": user[1], "organization": user[2]}
+    return {"error": "User not found"}

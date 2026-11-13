@@ -22,7 +22,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         <div className="pt-6 px-4 flex justify-between items-center shrink-0">
           <div className="flex items-center">
             <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-2"><Zap className="w-4 h-4 text-black" /></div>
-            <span className="text-lg font-bold text-white tracking-wide">FinSight</span>
+            <span className="text-lg font-bold text-white tracking-wide">OpsMind</span>
+          <div className="ml-2 text-[10px] text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">Acme Corp</div>
           </div>
           <button className="lg:hidden text-zinc-400 hover:text-white" onClick={() => setIsOpen(false)}><X className="w-5 h-5" /></button>
         </div>
@@ -34,7 +35,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
         <div className="flex-1 overflow-y-auto px-3 py-2">
           <SectionTitle title="General" />
-          <Link to="/" className={getLinkClass('/')}><span className="flex items-center"><LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard</span></Link>
+          <Link to="/dashboard" className={getLinkClass('/')}><span className="flex items-center"><LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard</span></Link>
           
           <SectionTitle title="AI Intelligence" />
           <Link to="/ai-copilot" className={getLinkClass('/ai-copilot')}><span className="flex items-center"><Bot className="w-4 h-4 mr-2" /> AI Copilot</span></Link>
