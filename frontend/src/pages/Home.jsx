@@ -4,11 +4,12 @@ import TopNavbar from '../components/Common/TopNavbar'
 import Footer from '../components/Common/Footer'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, ArrowDownRight, ClipboardCheck, Layout, MoreHorizontal, X, Cpu, HardDrive } from 'lucide-react'
+import { Play, UserPlus, Link as LinkIcon, CheckCircle, ArrowUpRight, ArrowDownRight, ClipboardCheck, Layout, MoreHorizontal, X, Cpu, HardDrive, Activity } from 'lucide-react'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 const Home = () => {
   const [stats, setStats] = useState(null)
-  const [sysMetrics, setSysMetrics] = useState(null)
+  const [sysMetrics, setSysMetrics] = useState([])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [showDemoModal, setShowDemoModal] = useState(false)
   const navigate = useNavigate()
@@ -16,14 +17,46 @@ const Home = () => {
   useEffect(() => {
     const fetchData = () => {
       axios.get('http://localhost:8000/api/v1/dashboard/stats').then(r => setStats(r.data)).catch(e => console.error(e))
-      axios.get('http://localhost:8000/api/v1/system/metrics').then(r => setSysMetrics(r.data)).catch(e => console.error(e))
+      
+      axios.get('http://localhost:8000/api/v1/system/metrics').then(r => {
+        setSysMetrics(prev => {
+          const newData = [...prev, { time: new Date().toLocaleTimeString(), cpu: r.data.cpu_percent, ram: r.data.memory_percent }]
+          return newData.slice(-25) // Last 25 data points
+        })
+      }).catch(e => console.error(e))
     }
+    
     fetchData()
-    const int = setInterval(fetchData, 5000)
+    const int = setInterval(fetchData, 2000)
     return () => clearInterval(int)
   }, [])
 
-  if (!stats || !sysMetrics) return <div className="flex h-screen bg-[#030303] text-white items-center justify-center">Loading Real Data...</div>
+  if (!stats || sysMetrics.length === 0) return <div className="flex h-screen bg-[#030303] text-white items-center justify-center">Loading Real Data...</div>
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-black/80 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-2xl ring-1 ring-white/5">
+          <p className="text-zinc-400 text-xs mb-3 font-mono tracking-widest">{label}</p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between space-x-4">
+              <span className="text-xs font-medium text-cyan-400 flex items-center">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 mr-2 shadow-[0_0_10px_#22D3EE]"></span> CPU
+              </span>
+              <span className="text-sm font-bold text-white">{payload[0]?.value}%</span>
+            </div>
+            <div className="flex items-center justify-between space-x-4">
+              <span className="text-xs font-medium text-yellow-400 flex items-center">
+                <span className="w-2 h-2 rounded-full bg-yellow-400 mr-2 shadow-[0_0_10px_#FACC15]"></span> RAM
+              </span>
+              <span className="text-sm font-bold text-white">{payload[1]?.value}%</span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <div className="flex h-screen bg-[#030303] font-sans text-gray-200 overflow-hidden relative">
@@ -34,10 +67,11 @@ const Home = () => {
         <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 lg:pb-8">
           <div className="max-w-[1400px] mx-auto">
             
+            {/* Header */}
             <div className="flex flex-col lg:flex-row justify-between items-start mb-6 lg:mb-8 gap-4">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-semibold text-white">Welcome Back, Aryan</h1>
-                <p className="text-zinc-400 text-xs lg:text-sm mt-1">Your AI control room — monitoring agents, costs, and compliance.</p>
+                <h1 className="text-2xl lg:text-3xl font-semibold text-white">Command Center</h1>
+                <p className="text-zinc-400 text-xs lg:text-sm mt-1">Real-time infrastructure overview and AI intelligence.</p>
               </div>
               
               <div className="grid grid-cols-4 lg:flex items-center gap-2 lg:gap-3 w-full lg:w-auto">
@@ -57,26 +91,27 @@ const Home = () => {
                   <div className="w-10 h-10 lg:w-8 lg:h-8 rounded bg-[#151515] border border-white/10 flex items-center justify-center mb-1"><Layout className="w-4 h-4" /></div>
                   <span className="text-[9px] lg:text-[10px] text-center">View Workspace</span>
                 </div>
-                <button onClick={() => setShowDemoModal(true)} className="col-span-4 lg:col-span-1 mt-2 lg:mt-0 bg-yellow-400 text-black font-bold px-4 lg:px-5 py-3 lg:py-2 rounded-lg hover:bg-yellow-500 flex items-center justify-center lg:ml-2 h-10 lg:h-9 text-xs lg:text-sm w-full"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
+                <button onClick={() => setShowDemoModal(true)} className="col-span-4 lg:col-span-1 mt-2 lg:mt-0 bg-yellow-400 text-black font-bold px-4 lg:px-5 py-3 lg:py-2 rounded-lg hover:bg-yellow-500 flex items-center justify-center lg:ml-2 h-10 lg:h-9 text-xs lg:text-sm w-full transition-all shadow-[0_0_15px_rgba(250,204,21,0.2)]"><Play className="w-4 h-4 mr-2"/> Launch Demo</button>
               </div>
             </div>
 
+            {/* KPI Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5 mb-5">
               <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
                 {[{t:'Success Rate', v:`${stats.success_rate}%`, d:'2.4% Compare from last month', c:'text-green-500', i:ArrowUpRight}, {t:'P95 Latency', v:`${stats.p95_latency}ms`, d:'12% Compare from last month', c:'text-red-500', i:ArrowDownRight}, {t:'Token', v:stats.token_usage, d:'18% Compare from last 24hrs', c:'text-green-500', i:ArrowUpRight}, {t:'Cost', v:stats.total_cost, d:'15% Compare from last 24hrs', c:'text-green-500', i:ArrowUpRight}].map((k,i)=>(
-                  <div key={i} className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5">
-                    <div className="flex justify-between items-start mb-4"><p className="text-zinc-400 text-xs lg:text-sm">{k.t}</p><MoreHorizontal className="w-4 h-4 text-zinc-600" /></div>
+                  <div key={i} className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5 hover:border-white/20 transition-all group">
+                    <div className="flex justify-between items-start mb-4"><p className="text-zinc-400 text-xs lg:text-sm group-hover:text-zinc-300">{k.t}</p><MoreHorizontal className="w-4 h-4 text-zinc-600 group-hover:text-white transition-colors" /></div>
                     <h3 className="text-2xl lg:text-3xl font-bold text-white">{k.v}</h3>
                     <p className={`text-[10px] lg:text-xs ${k.c} mt-2 flex items-center font-medium`}><k.i className="w-3 h-3 mr-1"/> {k.d}</p>
                   </div>
                 ))}
               </div>
               
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5 lg:p-6 flex flex-col justify-between">
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5 lg:p-6 flex flex-col justify-between hover:border-white/20 transition-all">
                 <div>
                   <p className="text-zinc-400 text-xs lg:text-sm mb-1">30-day Cost Forecast</p>
                   <h3 className="text-3xl lg:text-4xl font-bold text-white mt-1">{stats.cost_forecast}</h3>
-                  <p className="text-[10px] lg:text-xs text-green-500 mt-1 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 12% Projected spend for next 30 days</p>
+                  <p className="text-[10px] lg:text-xs text-green-500 mt-1 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 12% Projected spend</p>
                 </div>
                 <div className="my-6 overflow-x-auto pb-2">
                   <div className="min-w-[250px]">
@@ -97,6 +132,88 @@ const Home = () => {
                   <div className="flex items-center text-[10px] lg:text-xs text-zinc-300"><div className="w-4 h-4 rounded-full bg-yellow-500/20 flex items-center justify-center mr-2"><span className="text-yellow-500 text-[10px] font-bold">!</span></div>Confidence:</div>
                   <div className="text-xs lg:text-sm font-bold text-white">87% <span className="text-[10px] text-zinc-500 font-normal">vs last month</span></div>
                 </div>
+              </div>
+            </div>
+
+            {/* Premium Graph (New Design) */}
+            <div className="bg-gradient-to-b from-[#0A0A0A] to-[#050505] border border-white/10 rounded-xl p-6 mb-5 relative overflow-hidden">
+              {/* Grid Background */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+
+              <div className="flex justify-between items-center mb-8 relative z-10">
+                <div>
+                  <h3 className="text-white font-bold text-lg flex items-center">
+                    <Activity className="w-5 h-5 mr-2 text-white"/> Infrastructure Telemetry
+                  </h3>
+                  <p className="text-zinc-500 text-xs mt-1">Live CPU & Memory utilization stream</p>
+                </div>
+                <div className="flex space-x-4">
+                  <div className="flex items-center text-xs font-medium text-white">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 mr-2 shadow-[0_0_8px_#22D3EE]"></span> CPU
+                  </div>
+                  <div className="flex items-center text-xs font-medium text-white">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400 mr-2 shadow-[0_0_8px_#FACC15]"></span> RAM
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-[300px] w-full relative z-10">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={sysMetrics} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#22D3EE" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#22D3EE" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorRam" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#FACC15" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#FACC15" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    
+                    <XAxis 
+                      dataKey="time" 
+                      stroke="#52525b" 
+                      fontSize={10} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: '#71717a' }}
+                      dy={10}
+                    />
+                    <YAxis 
+                      stroke="#52525b" 
+                      fontSize={10} 
+                      tickLine={false} 
+                      axisLine={false}
+                      tick={{ fill: '#71717a' }}
+                      domain={[0, 100]}
+                    />
+                    <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.2)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                    
+                    <Area 
+                      type="monotone" 
+                      dataKey="cpu" 
+                      stroke="#22D3EE" 
+                      strokeWidth={2} 
+                      fillOpacity={1} 
+                      fill="url(#colorCpu)" 
+                      name="CPU %" 
+                      activeDot={{ r: 6, fill: '#22D3EE', stroke: '#fff', strokeWidth: 2, boxShadow: '0 0 10px #22D3EE' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="ram" 
+                      stroke="#FACC15" 
+                      strokeWidth={2} 
+                      fillOpacity={1} 
+                      fill="url(#colorRam)" 
+                      name="RAM %" 
+                      activeDot={{ r: 6, fill: '#FACC15', stroke: '#fff', strokeWidth: 2, boxShadow: '0 0 10px #FACC15' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
@@ -127,27 +244,25 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* NAYA: SYSTEM METRICS CARD */}
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-white font-medium mb-4 flex items-center"><Cpu className="w-4 h-4 mr-2 text-zinc-400"/> System Health</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-[10px] mb-1"><span className="text-zinc-400">CPU Usage</span><span className="text-white font-bold">{sysMetrics.cpu_percent}%</span></div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-blue-500 rounded-full transition-all duration-500" style={{ width: `${sysMetrics.cpu_percent}%` }}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-[10px] mb-1"><span className="text-zinc-400">Memory Usage</span><span className="text-white font-bold">{sysMetrics.memory_percent}%</span></div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-purple-500 rounded-full transition-all duration-500" style={{ width: `${sysMetrics.memory_percent}%` }}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-[10px] mb-1"><span className="text-zinc-400">Disk Usage</span><span className="text-white font-bold">{sysMetrics.disk_percent}%</span></div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-orange-500 rounded-full transition-all duration-500" style={{ width: `${sysMetrics.disk_percent}%` }}></div></div>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 lg:p-5 flex flex-col">
+                <div className="flex justify-between items-center mb-2"><h3 className="text-white font-medium">Compliance pulse</h3><MoreHorizontal className="w-4 h-4 text-zinc-600" /></div>
+                <div className="flex-1 flex flex-col items-center justify-center relative mt-4 mb-2">
+                  <div className="relative w-[180px] h-[90px]">
+                    <svg width="100%" height="100%" viewBox="0 0 200 100" className="overflow-visible">
+                      <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" strokeLinecap="round" />
+                      <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#F97316" strokeWidth="16" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="50" />
+                      <path d="M 20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#22C55E" strokeWidth="16" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="130" />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-1">
+                      <span className="text-[10px] text-zinc-400 mb-0.5">Policy Coverage</span>
+                      <span className="text-2xl lg:text-3xl font-bold text-white leading-none">94%</span>
                     </div>
                   </div>
                 </div>
-                <div className="mt-6 flex items-center justify-center text-[10px] text-zinc-500 bg-white/5 rounded border border-white/5 p-2">
-                  <HardDrive className="w-3 h-3 mr-2"/> Real-time System Metrics
+                <div className="space-y-1.5 mt-2">
+                  {[{n:'Data Privacy (DAT-001)', s:'Active', c:'text-green-400 bg-green-500/10'}, {n:'Approval Gates (APR-002)', s:'Active', c:'text-green-400 bg-green-500/10'}, {n:'Security Training (SEC-003)', s:'1 Draft', c:'text-orange-400 bg-orange-500/10'}, {n:'Incident Response Plan (IRP-004)', s:'Under Review', c:'text-blue-400 bg-blue-500/10'}].map((it, i) => (
+                    <div key={i} className="flex justify-between items-center text-[10px] p-2 bg-[#111113] rounded border border-white/5"><span className="text-zinc-300">{it.n}</span><span className={`${it.c} px-2 py-0.5 rounded font-medium`}>{it.s}</span></div>
+                  ))}
                 </div>
               </div>
 
@@ -184,4 +299,5 @@ const Home = () => {
     </div>
   )
 }
+
 export default Home
